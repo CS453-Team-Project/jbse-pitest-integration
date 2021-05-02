@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.cs453.group5.examples</groupId>
+  <artifactId>symbolic-mutation-test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>5.6.0</junit.version>
+    <maven.version>3.0.0-M1</maven.version>
+    <pitest.version>1.4.3</pitest.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jbse</groupId>
+      <artifactId>meta</artifactId>
+      <version>4.11</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/java/com/cs453/group5/examples/jbse-0.10.0-SNAPSHOT-shaded.jar</systemPath>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven.version}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>${pitest.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>0.8</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <targetClasses>
+            <param>com.cs453.group5.examples.*</param>
+          </targetClasses>
+          <targetTests>
+            <param>com.cs453.group5.examples.*</param>
+          </targetTests>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
