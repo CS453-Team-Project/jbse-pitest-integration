@@ -24,7 +24,7 @@ public class RunExample {
     // "isPositive");
     p.setMethodSignature("com/cs453/group5/examples/Calculator/mutants/2/Calculator", "(I)I", "isPositive");
     p.setDecisionProcedureType(Z3);
-    p.setExternalDecisionProcedurePath("C:\\Users\\jaego\\dev\\tools\\z3-4.6.0-x86-win\\bin\\z3");
+    p.setExternalDecisionProcedurePath("/opt/local/bin/z3");
     // p.setOutputFileName("./out/runIf_z3.txt");
     p.setStateFormatMode(TEXT);
     p.setStepShowMode(LEAVES);
