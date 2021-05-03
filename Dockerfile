@@ -15,9 +15,8 @@ WORKDIR /root
 RUN wget -O openJdk.tar.gz https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_x64_linux_hotspot_8u292b10.tar.gz && \
     mkdir openJdk8 && \
     tar -xvzf ./openJdk.tar.gz -C ./openJdk8 --strip-components 1 && \
-    ln -s /root/openJdk8 /usr/lib/java
-ENV JAVA_HOME /usr/lib/java
-ENV PATH $JAVA_HOME/bin:$PATH
+    ln -s /root/openJdk8 /usr/lib/java && \
+    rm ~/openJdk.tar.gz
 
 # Python
 RUN wget -O python3.9.tar.gz https://www.python.org/ftp/python/3.9.4/Python-3.9.4.tgz && \
@@ -25,21 +24,25 @@ RUN wget -O python3.9.tar.gz https://www.python.org/ftp/python/3.9.4/Python-3.9.
     cd $(ls | grep Python) && \
     ./configure && \
     make && \
-    make install
+    make install && \
+    rm ~/python3.9.tar.gz
 
 # Source code
 RUN git clone https://github.com/CS453-Team-Project/jbse-pitest-integration
 
 # MAVEN
 RUN wget -O maven.tar.gz https://mirror.navercorp.com/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz && \
-    mkdir maven && \
     tar -xvzf ./maven.tar.gz && \
-    mv ./$(ls | grep apache-maven) /opt
-ENV PATH /opt/$(ls /opt | grep apache-maven)/bin:$PATH
+    mv ./$(ls | grep apache-maven) /opt && \
+    rm ~/maven.tar.gz
 
 # Z3 symlink
 RUN mkdir -p /opt/local/bin && \
     ln -s $(which z3) /opt/local/bin/z3
+
+# ENV
+ENV JAVA_HOME /usr/lib/java
+ENV PATH /opt/apache-maven-3.8.1/bin:$JAVA_HOME/bin:$PATH
 
 # JBSE
 RUN git clone https://github.com/pietrobraione/jbse.git ~/jbse && \
