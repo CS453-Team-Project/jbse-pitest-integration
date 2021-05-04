@@ -11,20 +11,22 @@ import static jbse.apps.run.RunParameters.StepShowMode.LEAVES;
 public class RunExample {
   public static void main(String[] args) {
     final RunParameters p = new RunParameters();
-    set(p);
+    final String defaultClassBinaryName = "com/cs453/group5/examples/Calculator";
+
+    set(p, args.length > 0 ? args[0] : defaultClassBinaryName);
+
     final Run r = new Run(p);
     r.run();
   }
 
-  private static void set(RunParameters p) {
+  private static void set(RunParameters p, String classBinaryName) {
     p.addUserClasspath("./target/classes");
     p.addUserClasspath("./target/pit-reports/export");
     p.setJBSELibPath("./res/jbse-0.10.0-SNAPSHOT-shaded.jar");
 
-    p.setMethodSignature("com/cs453/group5/examples/Calculator/mutants/2/Calculator", "(I)I", "isPositive");
+    p.setMethodSignature(classBinaryName, "(I)I", "isPositive");
     p.setDecisionProcedureType(Z3);
     p.setExternalDecisionProcedurePath("/opt/local/bin/z3");
-    // p.setOutputFileName("./out/runIf_z3.txt");
     p.setStateFormatMode(TEXT);
     p.setStepShowMode(LEAVES);
   }

@@ -2,16 +2,14 @@
 
 ### Docker 빌드
 
-```
-docker build -t 
+```sh
+docker build -t <image name> .
 ```
 
 ### Start Maven
 
 * `mvn clean` : Maven 초기화
-* `mvn install` : Maven 빌드
-
-
+* `mvn package` : Maven 빌드
 
 ## PITest
 
@@ -24,10 +22,10 @@ mvn org.pitest:pitest-maven:mutationCoverage
 * Storing mutation bianary code
 
 ```
-mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures
+mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures=+EXPORT
 ```
 
-* stored directory: `.target\pit-reports\export`
+* Directory storing mutants: `.target\pit-reports\export`
 
 ## JBSE
 
@@ -37,7 +35,7 @@ mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures
 p.addUserClasspath("./target/classes");
 ```
 
-* `setMethodSignature()`: 실행하기위한 클래스  경로
+* `setMethodSignature()`: Class binary path, method signature, and method name
 
 ```
 p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive");
@@ -51,75 +49,12 @@ p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive
 
 ### Mutants 실행 방법
 
-(더 좋은 방법을 발견한 사람은 수정 부탁)
+```sh
+run [-m <mutant index>] <class name>
 
-Mutants 위치:  `.target\pit-reports\export\mutants\0~n`에 저장
+$ ./run
+Usage: ./run [-m <mutant index>] <class name>
 
-1. `com.cs453.group5.examples.Calculator.class`를 `Calculator.class`로 변경
-2. `addUserClasspath()` 변경
-   * `p.addUserClasspath("./target/pit-reports/export");`로 변경
-3. `setMethodSignature()` 변경
-   * `p.setMethodSignature("com/cs453/group5/examples/Calculator", ...)`로 변경
-
-## Docker build
-
-### Docker 빌드
-
+<class name>          Class name with dot syntax (e.g. com.cs453.group5.examples.Calculator)
+-m <mutant index>     Mutant index. By default, this script will run the original one.
 ```
-docker build -t 
-```
-
-### Start Maven
-
-* `mvn clean` : Maven 초기화
-* `mvn install` : Maven 빌드
-
-
-
-## PITest
-
-* PITest Execution
-
-```
-mvn org.pitest:pitest-maven:mutationCoverage
-```
-
-* Storing mutation bianary code
-
-```
-mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures
-```
-
-* stored directory: `.target\pit-reports\export`
-
-## JBSE
-
-* `addUserClassPath()`: 실행하기 위한 binary 파일이 위치한 directory
-
-```
-p.addUserClasspath("./target/classes");
-```
-
-* `setMethodSignature()`: 실행하기위한 클래스  경로
-
-```
-p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive");
-```
-
-* 참고
-  * `./target/classes/com/cs453/group5/examples/Calculator`에 대하여 Symbolic execution을 진행
-  * `(I)`: 타겟 함수 파라미터 타입
-  * `I`: 타겟 함수 리턴 타입
-  * `IsPositive`: 타겟 함수 명칭
-
-### Mutants 실행 방법
-
-(더 좋은 방법을 발견한 사람은 수정 부탁)
-
-Mutants 위치:  `.target\pit-reports\export\mutants\0~n`에 저장
-
-1. `com.cs453.group5.examples.Calculator.class`를 `Calculator.class`로 변경
-2. `addUserClasspath()` 변경
-   * `p.addUserClasspath("./target/pit-reports/export");`로 변경
-3. `setMethodSignature()` 변경
-   * `p.setMethodSignature("com/cs453/group5/examples/Calculator", ...)`로 변경

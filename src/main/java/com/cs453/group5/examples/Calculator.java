@@ -7,6 +7,8 @@ public class Calculator {
         int result = 0;
         if (number >= 0) {
             result = 1;
+        } else if (number < -1) {
+            result = -1;
         }
         // ass3rt(result == 1);
         return result;
