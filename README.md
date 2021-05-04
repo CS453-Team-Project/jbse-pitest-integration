@@ -55,7 +55,7 @@ p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive
 $ ./run
 Usage:
 
-# To functions either original one or mutated one
+# To run methods of either original one or mutated one
 ./run [-m <mutant index>] <class name> <method name>
 
 # To run PIT

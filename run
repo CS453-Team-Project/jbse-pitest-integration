@@ -8,7 +8,7 @@ usage() {
     cat << EOF >&2
 Usage:
 
-# To run methods either original one or mutated one
+# To run methods of either original one or mutated one
 $PROGNAME [-m <mutant index>] <class name> <method name>
 
 # To run PIT
