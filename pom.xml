@@ -47,6 +47,8 @@
           </dependency>
         </dependencies>
         <configuration>
+          <fullMutationMatrix>true</fullMutationMatrix>
+          <outputFormats>XML</outputFormats>
           <targetClasses>
             <param>com.cs453.group5.examples.*</param>
           </targetClasses>
