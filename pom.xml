@@ -21,9 +21,9 @@
     <dependency>
       <groupId>jbse</groupId>
       <artifactId>meta</artifactId>
-      <version>4.11</version>
+      <version>0.10.0</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/java/com/cs453/group5/examples/jbse-0.10.0-SNAPSHOT-shaded.jar</systemPath>
+      <systemPath>${project.basedir}/res/jbse-0.10.0-SNAPSHOT-shaded.jar</systemPath>
     </dependency>
   </dependencies>
 

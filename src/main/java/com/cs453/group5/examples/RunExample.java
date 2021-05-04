@@ -17,11 +17,10 @@ public class RunExample {
   }
 
   private static void set(RunParameters p) {
-    // p.addUserClasspath("./target/classes");
+    p.addUserClasspath("./target/classes");
     p.addUserClasspath("./target/pit-reports/export");
-    p.setJBSELibPath("./src/main/java/com/cs453/group5/examples/jbse-0.10.0-SNAPSHOT-shaded.jar");
-    // p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I",
-    // "isPositive");
+    p.setJBSELibPath("./res/jbse-0.10.0-SNAPSHOT-shaded.jar");
+
     p.setMethodSignature("com/cs453/group5/examples/Calculator/mutants/2/Calculator", "(I)I", "isPositive");
     p.setDecisionProcedureType(Z3);
     p.setExternalDecisionProcedurePath("/opt/local/bin/z3");
