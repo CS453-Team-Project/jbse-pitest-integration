@@ -52,6 +52,9 @@
           <targetClasses>
             <param>com.cs453.group5.examples.*</param>
           </targetClasses>
+          <excludedClasses>
+            <param>com.cs453.group5.examples.RunExample</param>
+          </excludedClasses>    
           <targetTests>
             <param>com.cs453.group5.examples.*</param>
           </targetTests>
