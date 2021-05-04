@@ -6,23 +6,34 @@ TARGET_PIT_REPORTS_EXPORT_PATH="target/pit-reports/export"
 
 usage() {
     cat << EOF >&2
-Usage: $PROGNAME [-m <mutant index>] <class name>
+Usage:
+
+# To functions either original one or mutated one
+$PROGNAME [-m <mutant index>] <class name> <method name>
+
+# To run PIT
+$PROGNAME -p
 
 <class name>          Class name with dot syntax (e.g. com.cs453.group5.examples.Calculator)
+<method name>         Method name (e.g. isPositive)
 -m <mutant index>     Mutant index. By default, this script will run the original one.
+-p                    Run PIT.
 
 EOF
     exit 1
 }
 
+do_pit() {
+    mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures=+EXPORT
+}
+
 do_pit_if_necessary() {
     if [[ ! -e $TARGET_PIT_REPORTS_EXPORT_PATH ]]; then
-        mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures=+EXPORT
+        do_pit
     elif [[ ! -d $TARGET_PIT_REPORTS_EXPORT_PATH ]]; then
         echo "$TARGET_PIT_REPORTS_EXPORT_PATH already exists but is not a directory." 1>&2
         exit 1
     fi
-
 }
 
 backup_original() {
@@ -30,6 +41,11 @@ backup_original() {
     src="$TARGET_CLASSES_PATH/${classname//./\/}.class"
     dest="$TARGET_PIT_REPORTS_EXPORT_PATH/${classname//./\/}/$basename.class"
     cp -n $src $dest
+}
+
+extract_method_signature() {
+    methodsig=$(sed -n "/$methodname/{s/.*$methodname//; p}" \
+        "$TARGET_PIT_REPORTS_EXPORT_PATH/${classname//./\/}/$classname.txt")
 }
 
 copy_mutant() {
@@ -45,22 +61,29 @@ copy_mutant() {
 }
 
 mutant=-1
-while getopts m: o; do
+while getopts m:s:p o; do
   case $o in
     (m) mutant=$OPTARG;;
+    (s) signature=$OPTARG;;
+    (p) do_pit; exit 1;;
     (*) usage
   esac
 done
 shift "$((OPTIND - 1))"
-classname="$@"
+classname="$1"
+methodname="$2"
 
-if [[ -z $classname ]]
+if [[ -z $classname || -z $methodname ]]
 then
     usage
 fi
 
 do_pit_if_necessary
 backup_original
+extract_method_signature
 copy_mutant
 java -cp 'target/classes:res/jbse-0.10.0-SNAPSHOT-shaded.jar' \
-     com.cs453.group5.examples.RunExample "${classname//./\/}"
+     com.cs453.group5.examples.RunExample \
+     "${classname//./\/}" \
+     "$methodsig" \
+     "$methodname"

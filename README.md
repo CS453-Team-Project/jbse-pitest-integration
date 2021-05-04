@@ -13,6 +13,8 @@ docker build -t <image name> .
 
 ## PITest
 
+`./run -p`
+
 * PITest Execution
 
 ```
@@ -50,11 +52,17 @@ p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive
 ### Mutants 실행 방법
 
 ```sh
-run [-m <mutant index>] <class name>
-
 $ ./run
-Usage: ./run [-m <mutant index>] <class name>
+Usage:
+
+# To functions either original one or mutated one
+./run [-m <mutant index>] <class name> <method name>
+
+# To run PIT
+./run -p
 
 <class name>          Class name with dot syntax (e.g. com.cs453.group5.examples.Calculator)
+<method name>         Method name (e.g. isPositive)
 -m <mutant index>     Mutant index. By default, this script will run the original one.
+-p                    Run PIT.
 ```

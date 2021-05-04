@@ -6,17 +6,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestCalculator {
-    @DisplayName("Test Positive")
+    @DisplayName("Get the sign of a positive integer.")
     @Test
     public void test1() {
         Calculator obj = new Calculator();
-        assertEquals(1, obj.isPositive(10));
+        assertEquals(1, obj.getSign(10));
     }
 
-    @DisplayName("Test Positive")
+    @DisplayName("Get the sign of the zero.")
     @Test
     public void test2() {
         Calculator obj = new Calculator();
-        assertEquals(1, obj.isPositive(0));
+        assertEquals(0, obj.getSign(0));
     }
 }
