@@ -34,7 +34,7 @@ public class RunExample {
 
     p.setMethodSignature(classBinaryName, methodSignature, methodName);
     p.setDecisionProcedureType(RunParameters.DecisionProcedureType.Z3);
-    p.setExternalDecisionProcedurePath("/opt/local/bin/z3");
+    p.setExternalDecisionProcedurePath("/opt/local/z3-4.8.10-x64-ubuntu-18.04/bin/z3");
     p.setStateFormatMode(RunParameters.StateFormatMode.TEXT);
     p.setStepShowMode(RunParameters.StepShowMode.LEAVES);
   }

@@ -86,4 +86,4 @@ java -cp 'target/classes:res/jbse-0.10.0-SNAPSHOT-shaded.jar' \
      com.cs453.group5.examples.RunExample \
      "${classname//./\/}" \
      "$methodsig" \
-     "$methodname"
+     "$methodname" > result.txt
