@@ -4,7 +4,7 @@ FROM ubuntu:18.04
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
-    git z3 ca-certificates \
+    git unzip ca-certificates \
     build-essential zlib1g-dev \
     libncurses5-dev libgdbm-dev libnss3-dev \
     libssl-dev libreadline-dev libffi-dev wget
@@ -36,9 +36,12 @@ RUN wget -O maven.tar.gz https://mirror.navercorp.com/apache/maven/maven-3/3.8.1
     mv ./$(ls | grep apache-maven) /opt && \
     rm ~/maven.tar.gz
 
-# Z3 symlink
-RUN mkdir -p /opt/local/bin && \
-    ln -s $(which z3) /opt/local/bin/z3
+# Z3
+RUN wget -O z3.zip https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-ubuntu-18.04.zip && \
+    unzip z3.zip && \
+    rm ~/z3.zip && \
+    mkdir -p /opt/local/bin && \
+    ln -s /root/$(ls | grep z3)/bin/z3 /opt/local/bin/z3
 
 # ENV
 ENV JAVA_HOME /usr/lib/java
