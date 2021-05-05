@@ -49,6 +49,11 @@ p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive
   * `I`: 타겟 함수 리턴 타입
   * `IsPositive`: 타겟 함수 명칭
 
+  ### JBSE 실행방법
+  ```
+  java -cp 'target/classes:res/jbse-0.10.0-SNAPSHOT-shaded.jar' com.cs453.group5.examples.{ClassName}
+  ```
+
 ### Mutants 실행 방법
 
 ```sh
