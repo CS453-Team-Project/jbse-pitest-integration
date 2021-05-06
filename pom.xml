@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.cs453.group5.examples</groupId>
   <artifactId>symbolic-mutation-test</artifactId>
@@ -8,6 +9,7 @@
     <junit.version>5.6.0</junit.version>
     <maven.version>3.0.0-M1</maven.version>
     <pitest.version>1.4.3</pitest.version>
+    <javaassist.version>3.27.0-GA</javaassist.version>
   </properties>
 
   <dependencies>
@@ -24,6 +26,14 @@
       <version>0.10.0</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/res/jbse-0.10.0-SNAPSHOT-shaded.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>${javaassist.version}</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/res/javassist.jar</systemPath>
     </dependency>
   </dependencies>
 
@@ -54,7 +64,7 @@
           </targetClasses>
           <excludedClasses>
             <param>com.cs453.group5.examples.RunExample</param>
-          </excludedClasses>    
+          </excludedClasses>
           <targetTests>
             <param>com.cs453.group5.examples.*</param>
           </targetTests>
