@@ -52,7 +52,16 @@ public class SymMain {
                 /**
                  * TODO: Instrument java byte code of this mutant and write it at
                  * '$CS453_PROJECT_HOME/target/classes/.../<classname>.class'.
-                 */
+                 */    
+                final String mutantBinPath = pathManager.getMutantsDirPath(classBinaryName) + "/" + String.format("%d", i-1);
+                final String mutantClass = mutId.getMutatedClass();
+                final String mutatedMethod = mutId.getMutatedMethod();
+                final int mutatedLine = mutId.getLine();
+
+                MutantTransformer mutTransformer = 
+                    new MutantTransformer(mutantClass, mutantBinPath, mutatedMethod);
+                
+                mutTransformer.inertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
 
                 /**
                  * TODO: Run JBSE. Capture the output of the JBSE. Related class is
