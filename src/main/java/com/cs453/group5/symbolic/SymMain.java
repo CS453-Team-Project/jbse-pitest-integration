@@ -58,15 +58,18 @@ public class SymMain {
                 final String mutatedMethod = mutId.getMutatedMethod();
                 final int mutatedLine = mutId.getLine();
 
-                MutantTransformer mutTransformer = 
-                    new MutantTransformer(mutantClass, mutantBinPath, mutatedMethod);
+                MutantTransformer mutTransformer = new MutantTransformer(
+                    mutantClass, mutantBinPath, mutatedMethod);
                 
                 mutTransformer.inertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
-
                 /**
                  * TODO: Run JBSE. Capture the output of the JBSE. Related class is
                  * 'JbseExecutor'.
                  */
+                final String classPath = mutantClass.replaceAll("[.]", "/"); // "com/cs453/group5/examples/Calculator"
+                final String methodSignature = mutId.methodDescription(); // ([C)I
+
+                jbseExecutor.runJbse(classPath, methodSignature, mutatedMethod);
             }
         }
     }
