@@ -1,7 +1,6 @@
 package com.cs453.group5.symbolic;
 
 import java.util.Set;
-import java.util.function.Consumer;
 
 import com.cs453.group5.symbolic.entities.MutantId;
 
@@ -38,13 +37,27 @@ public class SymMain {
 
         final Set<MutantId> mutIdSet = mutParser.getSurvivedMutantIds();
 
+        /**
+         * TODO: Backup a original byte code at
+         * '$CS453_PROJECT_HOME/target/classes/.../<classname>.class' to
+         * '$CS453_PROJECT_HOME/pitest-reports/export/.../<classname>.class'. ... is a
+         * '...' is a path related with the class. (e.g.
+         * com/cs453/group5/examples/Parenthese/)
+         */
         MutantId mutId;
         int i = 0;
         while ((mutId = mutDetailParser.getMutantDetails(i++)) != null) {
             if (mutIdSet.contains(mutId)) {
                 System.out.println(String.format("mutant#%d was survived.", i - 1));
-                /* TODO: Instrument java byte code of this mutant */
-                /* TODO: Run JBSE */
+                /**
+                 * TODO: Instrument java byte code of this mutant and write it at
+                 * '$CS453_PROJECT_HOME/target/classes/.../<classname>.class'.
+                 */
+
+                /**
+                 * TODO: Run JBSE. Capture the output of the JBSE. Related class is
+                 * 'JbseExecutor'.
+                 */
             }
         }
     }
