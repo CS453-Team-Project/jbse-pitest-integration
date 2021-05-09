@@ -50,7 +50,7 @@ public class SymMain {
         final JbseExecutor jbseExecutor = new JbseExecutor();
 
         /**
-         * TODO: Backup a original byte code at
+         * Backup a original byte code at
          * '$CS453_PROJECT_HOME/target/classes/.../<classname>.class' to
          * '$CS453_PROJECT_HOME/pitest-reports/export/.../<classname>.class'. ... is a
          * '...' is a path related with the class. (e.g.
@@ -78,7 +78,7 @@ public class SymMain {
             if (mutIdSet.contains(mutId)) {
                 System.out.println(String.format("mutant#%d was survived.", i - 1));
                 /**
-                 * TODO: Instrument java byte code of this mutant and write it at
+                 * Modify java byte code of this mutant and write it at
                  * '$CS453_PROJECT_HOME/target/classes/.../<classname>.class'.
                  */
                 final String mutantBinPath = String.format("%s/%d", mutantsDirPath, i - 1);
@@ -91,8 +91,8 @@ public class SymMain {
                 mutTransformer.inertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
 
                 /**
-                 * TODO: Run JBSE. Capture the output of the JBSE. Related class is
-                 * 'JbseExecutor'.
+                 * Run JBSE. Dump the output of the JBSE.
+                 * '$CS453_PROJECT_HOME/target/jbse-results/.../mutant-id-.txt'
                  */
                 final String classPath = mutantClass.replaceAll("[.]", "/"); // "com/cs453/group5/examples/Calculator"
                 final String methodSignature = mutId.methodDescription(); // ([C)I
