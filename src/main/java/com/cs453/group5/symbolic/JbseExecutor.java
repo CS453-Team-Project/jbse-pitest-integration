@@ -12,13 +12,8 @@ public class JbseExecutor {
         r.run();
     }
 
-    private void set(
-        RunParameters p, 
-        String classBinaryName, 
-        String methodSignature, 
-        String methodName
-    ) {
-        p.addUserClasspath("./");
+    private void set(RunParameters p, String classBinaryName, String methodSignature, String methodName) {
+        p.addUserClasspath("./target/classes");
         p.setJBSELibPath("./res/jbse-0.10.0-SNAPSHOT-shaded.jar");
 
         p.setMethodSignature(classBinaryName, methodSignature, methodName);

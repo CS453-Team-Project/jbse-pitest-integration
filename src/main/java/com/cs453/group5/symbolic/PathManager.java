@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 public class PathManager {
     private final String projectHome = System.getenv("CS453_PROJECT_HOME");
     private final String pitestBasePath = String.format("%s/target/pit-reports", projectHome);
+    private final String targetClassPath = String.format("%s/target/classes", projectHome);
 
     public Boolean isProjectHome() {
         final String currDir = System.getProperty("user.dir");
@@ -25,7 +26,7 @@ public class PathManager {
     }
 
     public String getMutantsDirPath(String classBinName) {
-        String classPath = classBinName.replace(".", "/");
+        String classPath = classBinNameToPath(classBinName);
         return String.format("%s/export/%s/mutants", pitestBasePath, classPath);
     }
 
@@ -52,5 +53,23 @@ public class PathManager {
         }
 
         return String.format("%s/%s/mutations.xml", pitestBasePath, xmlDir);
+    }
+
+    public String getTargetClassDirPath() {
+        return this.targetClassPath;
+    }
+
+    public String getBackupClassPath(String classBinName) {
+        String classPath = classBinNameToPath(classBinName);
+        return String.format("%s/target/backup-classes/%s.class", projectHome, classPath);
+    }
+
+    public String getClassPath(String classBinName) {
+        String classPath = classBinNameToPath(classBinName);
+        return String.format("%s/target/classes/%s.class", projectHome, classPath);
+    }
+
+    private String classBinNameToPath(String classBinName) {
+        return classBinName.replace(".", "/");
     }
 }

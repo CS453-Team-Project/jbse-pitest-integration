@@ -11,21 +11,19 @@ import javassist.CannotCompileException;
 import java.io.IOException;
 
 public class MutantTransformer {
-  private static String targetClass;
-  private static String classPath;
-  private static String targetMethod;
+  private final String targetClass;
+  private final String classPath;
+  private final String targetMethod;
+  private final String saveDirPath;
 
-  public MutantTransformer(
-    String targetCalss, 
-    String classPath, 
-    String targetMethod
-  ) {
+  public MutantTransformer(String targetCalss, String classPath, String targetMethod, String saveDirPath) {
     this.targetClass = targetCalss;
     this.classPath = classPath;
     this.targetMethod = targetMethod;
+    this.saveDirPath = saveDirPath;
   }
-  
-  public static void inertBytecode(int lineno, String command) {
+
+  public void inertBytecode(int lineno, String command) {
     try {
       //Get target class file
       ClassPool pool =  ClassPool.getDefault();
@@ -38,7 +36,8 @@ public class MutantTransformer {
       m.insertAt(lineno, true, command);
 
       //Write class file
-      cc.writeFile();
+      cc.writeFile(this.saveDirPath);
+      cc.defrost();
 
       System.out.println("Success");
     } catch (NotFoundException e){
