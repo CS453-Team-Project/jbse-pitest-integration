@@ -1,6 +1,5 @@
 package com.cs453.group5.symbolic;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,10 +42,12 @@ public class SymMain {
         // directories
         final String mutantsDirPath = pathManager.getMutantsDirPath(classBinaryName);
         final String targetClassDirPath = pathManager.getTargetClassDirPath();
+        final String jbseResultsDirPath = pathManager.getJbseResultsDirPath();
 
         /* Execute JBSE for each living mutants */
         final MutationsParser mutParser = new MutationsParser(pitReportPath);
         final MutantDetailsParser mutDetailParser = new MutantDetailsParser(mutantsDirPath);
+        final JbseResultParser jbseResultParser = new JbseResultParser(jbseResultsDirPath);
         final JbseExecutor jbseExecutor = new JbseExecutor();
 
         /**
@@ -59,8 +60,6 @@ public class SymMain {
         try {
             Path source = Paths.get(originalClassPath);
             Path target = Paths.get(backupClassPath);
-
-            System.out.println(source.toString());
 
             if (!Files.exists(target.getParent())) {
                 Files.createDirectories(target.getParent());
@@ -77,29 +76,36 @@ public class SymMain {
         while ((mutId = mutDetailParser.getMutantDetails(i++)) != null) {
             if (mutIdSet.contains(mutId)) {
                 System.out.println(String.format("mutant#%d was survived.", i - 1));
-                /**
-                 * Modify java byte code of this mutant and write it at
-                 * '$CS453_PROJECT_HOME/target/classes/.../<classname>.class'.
-                 */
-                final String mutantBinPath = String.format("%s/%d", mutantsDirPath, i - 1);
+
                 final String mutantClass = mutId.getMutatedClass();
                 final String mutatedMethod = mutId.getMutatedMethod();
                 final int mutatedLine = mutId.getLine();
 
-                MutantTransformer mutTransformer = new MutantTransformer(mutantClass, mutantBinPath, mutatedMethod,
+                final String classPath = mutantClass.replaceAll("[.]", "/");
+                final String methodSignature = mutId.methodDescription();
+
+                /* Apply Mutant's original byte code */
+                try {
+                    Path source = Paths.get(String.format("%s/%d/%s.class", mutantsDirPath, i - 1, classBinaryName));
+                    Path target = Paths
+                            .get(String.format("%s/%s.class", targetClassDirPath, classBinaryName.replace(".", "/")));
+
+                    if (!Files.exists(target.getParent())) {
+                        Files.createDirectories(target.getParent());
+                    }
+
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                /* Modify java byte code of this mutant. */
+                MutantTransformer mutTransformer = new MutantTransformer(mutantClass, mutatedMethod,
                         targetClassDirPath);
                 mutTransformer.inertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
 
-                /**
-                 * Run JBSE. Dump the output of the JBSE.
-                 * '$CS453_PROJECT_HOME/target/jbse-results/.../mutant-id-.txt'
-                 */
-                final String classPath = mutantClass.replaceAll("[.]", "/"); // "com/cs453/group5/examples/Calculator"
-                final String methodSignature = mutId.methodDescription(); // ([C)I
-
+                /* Run JBSE. Dump the output of the JBSE. */
                 jbseExecutor.runJbse(i - 1, classPath, methodSignature, mutatedMethod);
-
-                JbseResultParser jbseResultParser = new JbseResultParser();
                 jbseResultParser.extract(i - 1, classPath);
             }
         }

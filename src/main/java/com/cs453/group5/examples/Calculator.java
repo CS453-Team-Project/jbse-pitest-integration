@@ -1,7 +1,5 @@
 package com.cs453.group5.examples;
 
-import static jbse.meta.Analysis.ass3rt;
-
 public class Calculator {
     public int getSign(int number) {
         int result = 0;

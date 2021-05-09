@@ -14,6 +14,7 @@ public class PathManager {
     private final String projectHome = System.getenv("CS453_PROJECT_HOME");
     private final String pitestBasePath = String.format("%s/target/pit-reports", projectHome);
     private final String targetClassPath = String.format("%s/target/classes", projectHome);
+    private final String jbseResultsDirPath = String.format("%s/target/jbse-results", projectHome);
 
     public Boolean isProjectHome() {
         final String currDir = System.getProperty("user.dir");
@@ -67,6 +68,10 @@ public class PathManager {
     public String getClassPath(String classBinName) {
         String classPath = classBinNameToPath(classBinName);
         return String.format("%s/target/classes/%s.class", projectHome, classPath);
+    }
+
+    public String getJbseResultsDirPath() {
+        return jbseResultsDirPath;
     }
 
     private String classBinNameToPath(String classBinName) {

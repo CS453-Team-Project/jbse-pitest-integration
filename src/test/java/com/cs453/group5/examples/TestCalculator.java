@@ -13,10 +13,10 @@ public class TestCalculator {
         assertEquals(1, obj.getSign(10));
     }
 
-    @DisplayName("Get the sign of the zero.")
-    @Test
-    public void test2() {
-        Calculator obj = new Calculator();
-        assertEquals(0, obj.getSign(0));
-    }
+    // @DisplayName("Get the sign of the zero.")
+    // @Test
+    // public void test2() {
+    // Calculator obj = new Calculator();
+    // assertEquals(0, obj.getSign(0));
+    // }
 }

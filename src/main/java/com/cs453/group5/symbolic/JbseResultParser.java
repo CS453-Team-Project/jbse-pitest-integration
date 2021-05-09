@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JbseResultParser {
+  private String jbseResultsDirPath;
+
+  public JbseResultParser(String jbseResultsDirPath) {
+    this.jbseResultsDirPath = jbseResultsDirPath;
+  }
 
   public static Boolean isStartingPoint(String st) {
     if (st.isEmpty()) {
@@ -24,8 +29,7 @@ public class JbseResultParser {
   }
 
   public void extract(int id, String classBinaryName) {
-    String targetPath = String.format("/root/jbse-pitest-integration/target/jbse-results/%s/mutant%d.txt",
-        classBinaryName, id);
+    String targetPath = String.format("%s/%s/mutant%d.txt", jbseResultsDirPath, classBinaryName, id);
 
     try {
       File file = new File(targetPath);
