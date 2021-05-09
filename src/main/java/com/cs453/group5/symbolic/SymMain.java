@@ -98,6 +98,9 @@ public class SymMain {
                 final String methodSignature = mutId.methodDescription(); // ([C)I
 
                 jbseExecutor.runJbse(i - 1, classPath, methodSignature, mutatedMethod);
+
+                JbseResultParser jbseResultParser = new JbseResultParser();
+                jbseResultParser.extract(i - 1, classPath);
             }
         }
     }
