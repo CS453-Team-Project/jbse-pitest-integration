@@ -97,7 +97,7 @@ public class SymMain {
                 final String classPath = mutantClass.replaceAll("[.]", "/"); // "com/cs453/group5/examples/Calculator"
                 final String methodSignature = mutId.methodDescription(); // ([C)I
 
-                jbseExecutor.runJbse(classPath, methodSignature, mutatedMethod);
+                jbseExecutor.runJbse(i - 1, classPath, methodSignature, mutatedMethod);
             }
         }
     }
