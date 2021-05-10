@@ -71,3 +71,25 @@ Usage:
 -m <mutant index>     Mutant index. By default, this script will run the original one.
 -p                    Run PIT.
 ```
+
+### Mutants 실행 방법 2
+```sh
+# Add append this to ~/.bashrc
+alias mytool="java -cp 'target/classes:res/javassist.jar:res/jbse-0.10.0-SNAPSHOT-shaded.jar:res/picocli-4.6.1.jar' com.cs453.group5.symbolic.SymMain"
+
+Usage: mytool [-co] [-m=<mutantNumbers>,<mutantNumbers>,...]
+                    <classBinaryName> [<methods>...]
+      <classBinaryName>   Class name with dot syntax (e.g. com.cs453.group5.
+                            examples.Calculator)
+      [<methods>...]      Method names (e.g. isPositive isNegative ...).
+                            Default will run all methods of survived mutants.
+                            If option -o or -m was specified, then default will
+                            run nothing.
+      -c, --clean         Clear and rebuild.
+      -m, --mutants=<mutantNumbers>,<mutantNumbers>,...
+                          Run specific mutants. Parameters are the mutant
+                            indexes splitted with `,` (e.g. -m 1,2,3,4,5). In
+                            this run, the program will not generate test inputs.
+      -o, --original      Run original class. In his run, the program will not
+                            generate test inputs.
+```
