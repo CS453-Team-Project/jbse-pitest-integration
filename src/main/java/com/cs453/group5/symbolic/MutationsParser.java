@@ -24,6 +24,38 @@ public class MutationsParser {
         this.xmlPath = xmlPath;
     }
 
+    public String getMethodSignature(String method) {
+        String methodDescription = null;
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(new File(xmlPath));
+            doc.getDocumentElement().normalize();
+
+            NodeList list = doc.getElementsByTagName("mutation");
+            for (int temp = 0; temp < list.getLength(); temp++) {
+                Node node = list.item(temp);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+
+                    String mutatedMethod = element.getElementsByTagName("mutatedMethod").item(0).getTextContent();
+                    if (mutatedMethod.equals(method)) {
+                        methodDescription = element.getElementsByTagName("methodDescription").item(0).getTextContent();
+                        break;
+                    }
+                }
+            }
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return methodDescription;
+    }
+
     public Set<MutantId> getSurvivedMutantIds() {
         HashSet<MutantId> mutIdSet = new HashSet<MutantId>();
 

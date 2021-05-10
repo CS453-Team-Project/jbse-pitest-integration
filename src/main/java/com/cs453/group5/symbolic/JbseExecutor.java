@@ -10,6 +10,14 @@ import java.nio.file.Paths;
 import jbse.apps.run.Run;
 
 public class JbseExecutor {
+    private String mClassDirPath, mJbseLibPath, mOutputDirPath;
+
+    public JbseExecutor(String classDirPath, String jbseLibPath, String outputDirPath) {
+        mClassDirPath = classDirPath;
+        mJbseLibPath = jbseLibPath;
+        mOutputDirPath = outputDirPath;
+    }
+
     public void runJbse(int id, String classBinaryName, String methodSignature, String methodName) {
         RunParameters p = new RunParameters();
 
@@ -25,10 +33,10 @@ public class JbseExecutor {
 
     private void set(RunParameters p, int id, String classBinaryName, String methodSignature, String methodName)
             throws IOException {
-        final String outputFilePathStr = String.format("./target/jbse-results/%s/mutant%d.txt", classBinaryName, id);
+        final String outputFilePathStr = String.format("%s/%s/mutant%d.txt", mOutputDirPath, classBinaryName, id);
 
-        p.addUserClasspath("./target/classes");
-        p.setJBSELibPath("./res/jbse-0.10.0-SNAPSHOT-shaded.jar");
+        p.addUserClasspath(mClassDirPath);
+        p.setJBSELibPath(mJbseLibPath);
 
         p.setMethodSignature(classBinaryName, methodSignature, methodName);
         p.setDecisionProcedureType(RunParameters.DecisionProcedureType.Z3);

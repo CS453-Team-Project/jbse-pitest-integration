@@ -6,33 +6,53 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Class that manages absolute path of a file or a directory.
+ * 
+ * 1. Naming convention
+ * 
+ * @DirPath - Path of a directory
+ * @Path - Path of a file
  */
 public class PathManager {
+    private static final String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+
     private final String projectHome = System.getenv("CS453_PROJECT_HOME");
-    private final String pitestBasePath = String.format("%s/target/pit-reports", projectHome);
-    private final String targetClassPath = String.format("%s/target/classes", projectHome);
-    private final String jbseResultsDirPath = String.format("%s/target/jbse-results", projectHome);
+    private final String classDirPath = String.format("%s/target/classes", projectHome);
+    private final String backupClassDirPath = String.format("%s/target/backup-classes", projectHome);
+    private final String pitestBaseDirPath = String.format("%s/target/pit-reports", projectHome);
+    private final String jbseResultsDirPath = String.format("%s/target/jbse-results/%s", projectHome, timestamp);
+    private final String jbseLibPath = String.format("%s/res/jbse-0.10.0-SNAPSHOT-shaded.jar", projectHome);
 
     public Boolean isProjectHome() {
         final String currDir = System.getProperty("user.dir");
-        return currDir.equals(projectHome);
+        return currDir.equals(projectHome) || currDir.equals(projectHome + "/") || (currDir + "/").equals(projectHome);
     }
 
     public Boolean checkPIT() {
-        Path path = Paths.get(pitestBasePath);
+        Path path = Paths.get(pitestBaseDirPath);
         return Files.exists(path);
     }
 
-    public String getMutantsDirPath(String classBinName) {
+    public String getClassDirPath() {
+        return this.classDirPath;
+    }
+
+    public String getClassPath(String classBinName) {
         String classPath = classBinNameToPath(classBinName);
-        return String.format("%s/export/%s/mutants", pitestBasePath, classPath);
+        return String.format("%s/%s.class", classDirPath, classPath);
+    }
+
+    public String getBackupClassPath(String classBinName) {
+        String classPath = classBinNameToPath(classBinName);
+        return String.format("%s/%s.class", backupClassDirPath, classPath);
     }
 
     public String getRecentPitestReportPath() {
-        final String command = String.format("cd %s && ls -d */ | grep 20", pitestBasePath);
+        final String command = String.format("cd %s && ls -d */ | grep 20", pitestBaseDirPath);
         final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command);
 
         String xmlDir = "";
@@ -53,28 +73,27 @@ public class PathManager {
             e.printStackTrace();
         }
 
-        return String.format("%s/%s/mutations.xml", pitestBasePath, xmlDir);
+        return String.format("%s/%s/mutations.xml", pitestBaseDirPath, xmlDir);
     }
 
-    public String getTargetClassDirPath() {
-        return this.targetClassPath;
-    }
-
-    public String getBackupClassPath(String classBinName) {
+    public String getMutantsDirPath(String classBinName) {
         String classPath = classBinNameToPath(classBinName);
-        return String.format("%s/target/backup-classes/%s.class", projectHome, classPath);
+        return String.format("%s/export/%s/mutants", pitestBaseDirPath, classPath);
     }
 
-    public String getClassPath(String classBinName) {
-        String classPath = classBinNameToPath(classBinName);
-        return String.format("%s/target/classes/%s.class", projectHome, classPath);
+    public String getMutantClassPath(String classBinName, int mutantNumber) {
+        return String.format("%s/%d/%s.class", getMutantsDirPath(classBinName), mutantNumber, classBinName);
     }
 
     public String getJbseResultsDirPath() {
         return jbseResultsDirPath;
     }
 
-    private String classBinNameToPath(String classBinName) {
+    public String getJbseLibPath() {
+        return jbseLibPath;
+    }
+
+    public String classBinNameToPath(String classBinName) {
         return classBinName.replace(".", "/");
     }
 }

@@ -10,6 +10,7 @@
     <maven.version>3.0.0-M1</maven.version>
     <pitest.version>1.4.3</pitest.version>
     <javaassist.version>3.27.0-GA</javaassist.version>
+    <maven-compiler-plugin-version>3.8.1</maven-compiler-plugin-version>
   </properties>
 
   <dependencies>
@@ -34,6 +35,14 @@
       <version>${javaassist.version}</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/res/javassist.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>4.6.1</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/res/picocli-4.6.1.jar</systemPath>
     </dependency>
   </dependencies>
 
@@ -68,6 +77,25 @@
           <targetTests>
             <param>com.cs453.group5.examples.*</param>
           </targetTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <!-- annotationProcessorPaths requires maven-compiler-plugin version 3.5 or higher -->
+        <version>${maven-compiler-plugin-version}</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>info.picocli</groupId>
+              <artifactId>picocli-codegen</artifactId>
+              <version>4.6.1</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
     </plugins>

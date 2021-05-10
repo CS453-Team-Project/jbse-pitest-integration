@@ -30,7 +30,7 @@ public class MutantId {
         return mutatedMethod;
     }
 
-    public String methodDescription() {
+    public String getMethodDescription() {
         return methodDescription;
     }
 
