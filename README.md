@@ -74,10 +74,10 @@ Usage:
 
 ### Mutants 실행 방법 2
 ```sh
-# Add append this to ~/.bashrc
+# Append this line to ~/.bashrc
 alias mytool="java -cp 'target/classes:res/javassist.jar:res/jbse-0.10.0-SNAPSHOT-shaded.jar:res/picocli-4.6.1.jar' com.cs453.group5.symbolic.SymMain"
 
-Usage: mytool [-co] [-m=<mutantNumbers>,<mutantNumbers>,...]
+Usage: <main class> [-co] [-m=<mutantNumbers>[,<mutantNumbers>...]...]...
                     <classBinaryName> [<methods>...]
       <classBinaryName>   Class name with dot syntax (e.g. com.cs453.group5.
                             examples.Calculator)
@@ -86,10 +86,28 @@ Usage: mytool [-co] [-m=<mutantNumbers>,<mutantNumbers>,...]
                             If option -o or -m was specified, then default will
                             run nothing.
       -c, --clean         Clear and rebuild.
-      -m, --mutants=<mutantNumbers>,<mutantNumbers>,...
+      -m, --mutants=<mutantNumbers>[,<mutantNumbers>...]...
                           Run specific mutants. Parameters are the mutant
-                            indexes splitted with `,` (e.g. -m 1,2,3,4,5). In
-                            this run, the program will not generate test inputs.
-      -o, --original      Run original class. In his run, the program will not
-                            generate test inputs.
+                            indexes splitted with `,` (e.g. -m 1,2,3,4,5). The
+                            program will not modify the byte code and return
+                            pure jbse report.
+      -o, --original      Run original class. In his run, Run original class.
+                            The program will not modify the byte code and
+                            return pure jbse report.
+
+# Examples
+# 1. Run pitest if needed. Find survived mutants. Insert jbse ass3rt. run jbse.
+$ mytool com.cs453.group5.examples.Parenthese
+
+# 2. Run pitest if needed. Find mutant 1, 2, 3, 4. Run jbse.
+$ mytool com.cs453.group5.examples.Parenthese -m 1,2,3,4
+
+# 3. Run pitest if needed. Find original class file. Run jbse.
+$ mytool com.cs453.group5.examples.Parenthese -o
+
+# 4. Clean build and run pitest. Same with ex 1.
+$ mytool com.cs453.group5.examples.Parenthese -c
+
+# 5. Run pitest if needed. Find survived mutants that has mutated method check1 or check2. Insert jbse ass3rt. run jbse.
+$ mytool com.cs453.group5.examples.Parenthes check1 check2
 ```

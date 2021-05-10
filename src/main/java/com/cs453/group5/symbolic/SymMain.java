@@ -28,11 +28,11 @@ public class SymMain implements Callable<Integer> {
     private Boolean cleanOpt;
 
     @Option(names = { "-o",
-            "--original" }, defaultValue = "false", description = "Run original class. In his run, the program will not generate test inputs.")
+            "--original" }, defaultValue = "false", description = "Run original class. In his run, Run original class. The program will not modify the byte code and return pure jbse report.")
     private Boolean originalOpt;
 
     @Option(names = { "-m",
-            "--mutants" }, arity = "1..*", split = ",", description = "Run specific mutants. Parameters are the mutant indexes splitted with `,` (e.g. -m 1,2,3,4,5). In this run, the program will not generate test inputs.")
+            "--mutants" }, arity = "1..*", split = ",", description = "Run specific mutants. Parameters are the mutant indexes splitted with `,` (e.g. -m 1,2,3,4,5). The program will not modify the byte code and return pure jbse report.")
     private List<Integer> mutantNumbers;
 
     public static void main(String[] args) {
