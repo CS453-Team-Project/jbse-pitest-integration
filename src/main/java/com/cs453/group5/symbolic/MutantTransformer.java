@@ -33,7 +33,7 @@ public class MutantTransformer {
 
       // Write class file
       cc.writeFile(this.saveDirPath);
-      cc.defrost();
+      cc.detach();
 
       System.out.println("Success");
     } catch (NotFoundException e) {
