@@ -77,7 +77,8 @@ Usage:
 
 ### Mutants 실행 방법 2
 ```sh
-# Append this line to ~/.bashrc
+# Append following lines to ~/.bashrc
+export CS453_PROJECT_HOME=/root/jbse-pitest-integration
 alias mytool="java -cp 'target/classes:res/javassist.jar:res/jbse-0.10.0-SNAPSHOT-shaded.jar:res/picocli-4.6.1.jar' com.cs453.group5.symbolic.SymMain"
 
 Usage: <main class> [-co] [-m=<mutantNumbers>[,<mutantNumbers>...]...]...
