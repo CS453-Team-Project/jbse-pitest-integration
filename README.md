@@ -60,15 +60,18 @@ p.setMethodSignature("com/cs453/group5/examples/Calculator", "(I)I", "isPositive
 $ ./run
 Usage:
 
-# To run methods of either original one or mutated one
-./run [-m <mutant index>] <class name> <method name>
+# Run methods of either original one or mutated one.
+# If [-m <mutant index>] is omitted, this script will run JBSE for the original method.
+# The output can be piped into a text file using `> result.txt`.
+./run [-m <mutant index>] [-c] <class name> <method name> [> result.txt]
 
-# To run PIT
+# Run PIT
 ./run -p
 
 <class name>          Class name with dot syntax (e.g. com.cs453.group5.examples.Calculator)
 <method name>         Method name (e.g. isPositive)
 -m <mutant index>     Mutant index. By default, this script will run the original one.
+-c                    Clear and rebuild the project.
 -p                    Run PIT.
 ```
 

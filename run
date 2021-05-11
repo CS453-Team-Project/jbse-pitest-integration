@@ -23,6 +23,10 @@ EOF
     exit 1
 }
 
+clean_and_package() { 
+    mvn clean && mvn package
+}
+
 do_pit() {
     mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures=+EXPORT
 }
@@ -61,11 +65,12 @@ copy_mutant() {
 }
 
 mutant=-1
-while getopts m:s:p o; do
+while getopts m:s:pc o; do
   case $o in
     (m) mutant=$OPTARG;;
     (s) signature=$OPTARG;;
     (p) do_pit; exit 1;;
+    (c) clean_and_package;;
     (*) usage
   esac
 done
