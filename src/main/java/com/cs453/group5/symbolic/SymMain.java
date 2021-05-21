@@ -81,6 +81,7 @@ public class SymMain implements Callable<Integer> {
         final JbseResultParser jbseResultParser = new JbseResultParser(pathManager.getJbseResultsDirPath());
         final JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath(),
                 pathManager.getJbseResultsDirPath());
+        final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor();
 
         backupOriginalClass();
 
@@ -106,6 +107,14 @@ public class SymMain implements Callable<Integer> {
                 MutantTransformer mutTransformer = new MutantTransformer(mutantClass, mutatedMethod,
                         pathManager.getClassDirPath());
                 mutTransformer.inertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
+
+                try {
+                    pathFinderExecutor.execFinder(mutantClass, mutatedMethod);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
 
                 final String classPath = pathManager.classBinNameToPath(mutantClass);
                 jbseExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
