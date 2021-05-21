@@ -11,10 +11,14 @@ import java.util.List;
 import org.objectweb.asm.Type;
 
 public class PathFinderExecutor {
-    private PathManager pathManager = new PathManager();
+    private String jbseResultDirPath;
 
-    public PathFinderExecutor(PathManager pathManager) {
-        this.pathManager = pathManager;
+    public PathFinderExecutor(String jbseResultDirPath) {
+        this.jbseResultDirPath = jbseResultDirPath;
+    }
+
+    public void setJbseResultDirPath(String jbseResultDirPath) {
+        this.jbseResultDirPath = jbseResultDirPath;
     }
 
     public String execFinder(String classBinName, String methodName, int mutantNumber)
@@ -32,9 +36,8 @@ public class PathFinderExecutor {
             throw new IllegalArgumentException("Method info null!");
         }
 
-        String classPath = pathManager.classBinNameToPath(classBinName);
-        String textPath = String.format("%s/%s/mutant%d.txt", pathManager.getJbseResultsDirPath(), classPath,
-                mutantNumber);
+        String classPath = Utils.classNameToSlashedPath(classBinName);
+        String textPath = String.format("%s/%s/mutant%d.txt", jbseResultDirPath, classPath, mutantNumber);
 
         // Run python code
         final String command = String.format("python3 parse-jbse-output/src/main.py -t \"%s\" -m \"%s:%s:%s:%s\"",

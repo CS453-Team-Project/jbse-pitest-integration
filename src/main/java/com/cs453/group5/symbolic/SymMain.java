@@ -85,7 +85,9 @@ public class SymMain implements Callable<Integer> {
                 pathManager.getJbseResultsDirPath());
         final JbseExecutor jbseInfectionExecutor = new JbseExecutor(pathManager.getClassDirPath(),
                 pathManager.getJbseLibPath(), pathManager.getJbseInfectionResultsDirPath());
-        final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager);
+        final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager.getJbseResultsDirPath());
+        final PathFinderExecutor infectionPathFinderExecutor = new PathFinderExecutor(
+                pathManager.getJbseResultsDirPath());
 
         backupOriginalClass();
 
@@ -117,13 +119,15 @@ public class SymMain implements Callable<Integer> {
                 jbseResultParser.extract(mutantNumber, classPath);
 
                 try {
-                    String command = pathFinderExecutor.execFinder(mutantClass, mutatedMethod, mutantNumber);
-
+                    String condition = pathFinderExecutor.execFinder(mutantClass, mutatedMethod, mutantNumber);
                     applyMutatedClass(mutantNumber);
-                    mutTransformer.insertBoth(mutatedLine, command, "jbse.meta.Analysis.ass3rt(false);");
+                    mutTransformer.insertBoth(mutatedLine, condition, "jbse.meta.Analysis.ass3rt(false);");
 
                     jbseInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
                     jbseInfectionResultParser.extract(mutantNumber, classPath);
+
+                    String infectionCondition = infectionPathFinderExecutor.execFinder(mutantClass, mutatedMethod,
+                            mutantNumber);
                 } catch (SecurityException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
