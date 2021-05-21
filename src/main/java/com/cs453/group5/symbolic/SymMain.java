@@ -79,8 +79,12 @@ public class SymMain implements Callable<Integer> {
         final MutantDetailsParser mutDetailParser = new MutantDetailsParser(
                 pathManager.getMutantsDirPath(classBinaryName));
         final JbseResultParser jbseResultParser = new JbseResultParser(pathManager.getJbseResultsDirPath());
+        final JbseResultParser jbseInfectionResultParser = new JbseResultParser(
+                pathManager.getJbseInfectionResultsDirPath());
         final JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath(),
                 pathManager.getJbseResultsDirPath());
+        final JbseExecutor jbseInfectionExecutor = new JbseExecutor(pathManager.getClassDirPath(),
+                pathManager.getJbseLibPath(), pathManager.getJbseInfectionResultsDirPath());
         final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager);
 
         backupOriginalClass();
@@ -113,7 +117,13 @@ public class SymMain implements Callable<Integer> {
                 jbseResultParser.extract(mutantNumber, classPath);
 
                 try {
-                    pathFinderExecutor.execFinder(mutantClass, mutatedMethod, mutantNumber);
+                    String command = pathFinderExecutor.execFinder(mutantClass, mutatedMethod, mutantNumber);
+
+                    applyMutatedClass(mutantNumber);
+                    mutTransformer.insertBoth(mutatedLine, command, "jbse.meta.Analysis.ass3rt(false);");
+
+                    jbseInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
+                    jbseInfectionResultParser.extract(mutantNumber, classPath);
                 } catch (SecurityException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {

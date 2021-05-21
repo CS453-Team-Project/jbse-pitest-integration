@@ -39,7 +39,12 @@ public class PathFinderExecutor {
         // Run python code
         final String command = String.format("python3 parse-jbse-output/src/main.py -t \"%s\" -m \"%s:%s:%s:%s\"",
                 textPath, classPath, methodName, methodInfo.descriptor, String.join(":", methodInfo.parameterNames));
-        return runPythonFinder(command);
+        String result = runPythonFinder(command).trim();
+        if (result.equals("True")) {
+            return "true";
+        } else {
+            return result;
+        }
     }
 
     private String runPythonFinder(String command) {

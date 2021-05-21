@@ -45,16 +45,18 @@ public class MutantTransformer {
     }
   }
 
-  public void insertAssume(String condition) {
+  public void insertBoth(int lineno, String condition, String command) {
     try {
       // Get target class file
       ClassPool pool = ClassPool.getDefault();
       pool.importPackage("jbse.meta.Analysis.ass3rt");
+      pool.importPackage("jbse.meta.Analysis.assume");
       CtClass cc = pool.get(targetClass);
 
       // Insert Byte code, ass3rt(false) in target file
       CtMethod m = cc.getDeclaredMethod(targetMethod);
-      m.insertBefore(condition);
+      m.insertBefore(String.format("jbse.meta.Analysis.assume(%s);", condition));
+      m.insertAt(lineno + 1, true, command);
       // Write class file
       cc.writeFile(this.saveDirPath);
       cc.detach();
