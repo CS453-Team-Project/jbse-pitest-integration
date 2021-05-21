@@ -44,4 +44,28 @@ public class MutantTransformer {
       e.printStackTrace();
     }
   }
+
+  public void insertAssume(String condition) {
+    try {
+      // Get target class file
+      ClassPool pool = ClassPool.getDefault();
+      pool.importPackage("jbse.meta.Analysis.ass3rt");
+      CtClass cc = pool.get(targetClass);
+
+      // Insert Byte code, ass3rt(false) in target file
+      CtMethod m = cc.getDeclaredMethod(targetMethod);
+      m.insertBefore(condition);
+      // Write class file
+      cc.writeFile(this.saveDirPath);
+      cc.detach();
+
+      System.out.println("Success");
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    } catch (CannotCompileException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
