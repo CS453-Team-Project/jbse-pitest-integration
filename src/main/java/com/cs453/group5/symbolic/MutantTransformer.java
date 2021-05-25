@@ -56,7 +56,9 @@ public class MutantTransformer {
       // Insert Byte code, ass3rt(false) in target file
       CtMethod m = cc.getDeclaredMethod(targetMethod);
       m.insertBefore(String.format("jbse.meta.Analysis.assume(%s);", condition));
-      m.insertAt(lineno + 1, true, command);
+      if (!command.equals("")) {
+        m.insertAt(lineno + 1, true, command);
+      }
       // Write class file
       cc.writeFile(this.saveDirPath);
       cc.detach();

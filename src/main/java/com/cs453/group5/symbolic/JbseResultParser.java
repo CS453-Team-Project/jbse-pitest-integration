@@ -24,11 +24,16 @@ public class JbseResultParser {
     return st.toCharArray()[0] == '.';
   }
 
-  public static Boolean isViolated(String st) {
-    return st.contains("path violates an assertion.");
+  public static Boolean isViolated(String st, boolean violation) {
+    if (violation) {
+
+      return st.contains("path violates an assertion.");
+    } else {
+      return st.contains("path is safe.");
+    }
   }
 
-  public void extract(int id, String classBinaryName) {
+  public void extract(int id, String classBinaryName, boolean violation) {
     String targetPath = String.format("%s/%s/mutant%d.txt", jbseResultsDirPath, classBinaryName, id);
 
     try {
@@ -45,7 +50,7 @@ public class JbseResultParser {
       while ((line = bufferedReader.readLine()) != null) {
         if (isStartingPoint(line)) {
           if (start) {
-            if (isViolated(line)) {
+            if (isViolated(line, violation)) {
               start = false;
               stringBuffer.append(line + "\n\n");
               System.out.println(stringBuffer.toString());

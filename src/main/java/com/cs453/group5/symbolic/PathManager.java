@@ -27,6 +27,8 @@ public class PathManager {
     private final String jbseResultsDirPath = String.format("%s/target/jbse-results/%s", projectHome, timestamp);
     private final String jbseInfectionResultsDirPath = String.format("%s/target/jbse-results/%s/infection", projectHome,
             timestamp);
+    private final String jbseOriginInfectionResultsDirPath = String.format("%s/target/jbse-results/%s/origin",
+            projectHome, timestamp);
     private final String jbseLibPath = String.format("%s/res/jbse-0.10.0-SNAPSHOT-shaded.jar", projectHome);
 
     public Boolean isProjectHome() {
@@ -93,6 +95,10 @@ public class PathManager {
 
     public String getJbseInfectionResultsDirPath() {
         return jbseInfectionResultsDirPath;
+    }
+
+    public String getJbseOriginInfectionResultsDirPath() {
+        return jbseOriginInfectionResultsDirPath;
     }
 
     public String getJbseLibPath() {

@@ -81,10 +81,14 @@ public class SymMain implements Callable<Integer> {
         final JbseResultParser jbseResultParser = new JbseResultParser(pathManager.getJbseResultsDirPath());
         final JbseResultParser jbseInfectionResultParser = new JbseResultParser(
                 pathManager.getJbseInfectionResultsDirPath());
+        final JbseResultParser jbseOriginInfectionResultParser = new JbseResultParser(
+                pathManager.getJbseOriginInfectionResultsDirPath());
         final JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath(),
                 pathManager.getJbseResultsDirPath());
         final JbseExecutor jbseInfectionExecutor = new JbseExecutor(pathManager.getClassDirPath(),
                 pathManager.getJbseLibPath(), pathManager.getJbseInfectionResultsDirPath());
+        final JbseExecutor jbseOriginInfectionExecutor = new JbseExecutor(pathManager.getClassDirPath(),
+                pathManager.getJbseLibPath(), pathManager.getJbseOriginInfectionResultsDirPath());
         final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager.getJbseResultsDirPath());
         final PathFinderExecutor infectionPathFinderExecutor = new PathFinderExecutor(
                 pathManager.getJbseResultsDirPath());
@@ -116,7 +120,7 @@ public class SymMain implements Callable<Integer> {
 
                 final String classPath = pathManager.classBinNameToPath(mutantClass);
                 jbseExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-                jbseResultParser.extract(mutantNumber, classPath);
+                jbseResultParser.extract(mutantNumber, classPath, true);
 
                 try {
                     String condition = pathFinderExecutor.execFinder(mutantClass, mutatedMethod, mutantNumber);
@@ -124,10 +128,26 @@ public class SymMain implements Callable<Integer> {
                     mutTransformer.insertBoth(mutatedLine, condition, "jbse.meta.Analysis.ass3rt(false);");
 
                     jbseInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-                    jbseInfectionResultParser.extract(mutantNumber, classPath);
+                    jbseInfectionResultParser.extract(mutantNumber, classPath, true);
 
                     String infectionCondition = infectionPathFinderExecutor.execFinder(mutantClass, mutatedMethod,
                             mutantNumber);
+
+                    System.out.println("====================================");
+                    System.out.println("run mutant with infection condition");
+                    System.out.println("====================================");
+                    applyMutatedClass(mutantNumber);
+                    mutTransformer.insertBoth(mutatedLine, infectionCondition, "");
+
+                    jbseInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
+                    jbseInfectionResultParser.extract(mutantNumber, classPath, false);
+
+                    restoreOriginalClass();
+                    mutTransformer.insertBoth(mutatedLine, infectionCondition, "");
+
+                    jbseOriginInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
+                    jbseOriginInfectionResultParser.extract(mutantNumber, classPath, false);
+
                 } catch (SecurityException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
