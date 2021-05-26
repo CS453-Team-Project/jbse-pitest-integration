@@ -116,7 +116,7 @@ public class SymMain implements Callable<Integer> {
                 applyMutatedClass(mutantNumber);
                 MutantTransformer mutTransformer = new MutantTransformer(mutantClass, mutatedMethod,
                         pathManager.getClassDirPath());
-                mutTransformer.inertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
+                mutTransformer.insertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
 
                 final String classPath = pathManager.classBinNameToPath(mutantClass);
                 jbseExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);

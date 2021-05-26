@@ -20,7 +20,7 @@ public class MutantTransformer {
     this.saveDirPath = saveDirPath;
   }
 
-  public void inertBytecode(int lineno, String command) {
+  public void insertBytecode(int lineno, String command) {
     try {
       // Get target class file
       ClassPool pool = ClassPool.getDefault();
