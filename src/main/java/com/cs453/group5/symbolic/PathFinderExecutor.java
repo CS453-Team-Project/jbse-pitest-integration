@@ -59,10 +59,7 @@ public class PathFinderExecutor {
             Process process = processBuilder.start();
 
             BufferedReader outReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = outReader.readLine()) != null) {
-                returnLine = line;
-            }
+            returnLine = outReader.readLine();
 
             process.waitFor();
         } catch (IOException e) {
@@ -71,7 +68,7 @@ public class PathFinderExecutor {
             e.printStackTrace();
         }
 
-        if (returnLine == null) {
+        if (returnLine == null || returnLine.isEmpty()) {
             throw new IllegalArgumentException("Python Path Finder returns nothing!");
         }
 
