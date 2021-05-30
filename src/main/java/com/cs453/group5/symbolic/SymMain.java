@@ -35,6 +35,12 @@ public class SymMain implements Callable<Integer> {
             "--mutants" }, arity = "1..*", split = ",", description = "Run specific mutants. Parameters are the mutant indexes splitted with `,` (e.g. -m 1,2,3,4,5). The program will not modify the byte code and return pure jbse report.")
     private List<Integer> mutantNumbers;
 
+    // @Option(names = { "-a",
+    // "--assume" }, defaultValue = "my_tool_assume.json", description = "Run jbse
+    // with user assume options (e.g. -a my_tool_assume.json). The program will not
+    // modify the byte code and return pure jbse report.")
+    // private String assumeFile;
+
     public static void main(String[] args) {
         int exitCode = new CommandLine(new SymMain()).execute(args);
         System.exit(exitCode);
@@ -92,7 +98,7 @@ public class SymMain implements Callable<Integer> {
         final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager.getJbseResultsDirPath());
         final PathFinderExecutor infectionPathFinderExecutor = new PathFinderExecutor(
                 pathManager.getJbseResultsDirPath());
-
+        final UserAssume userAssume = new UserAssume(classBinaryName);
         backupOriginalClass();
 
         /* For each survived mutant, modify byte code and run */
@@ -115,7 +121,7 @@ public class SymMain implements Callable<Integer> {
 
                 applyMutatedClass(mutantNumber);
                 MutantTransformer mutTransformer = new MutantTransformer(mutantClass, mutatedMethod,
-                        pathManager.getClassDirPath());
+                        pathManager.getClassDirPath(), userAssume);
                 mutTransformer.insertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
 
                 final String classPath = pathManager.classBinNameToPath(mutantClass);
@@ -135,6 +141,7 @@ public class SymMain implements Callable<Integer> {
 
                     System.out.println("====================================");
                     System.out.println("run mutant with infection condition");
+                    System.out.println(String.format("user assume class: %s", userAssume.getCommand()));
                     System.out.println("====================================");
                     applyMutatedClass(mutantNumber);
                     mutTransformer.insertBoth(mutatedLine, infectionCondition, "");

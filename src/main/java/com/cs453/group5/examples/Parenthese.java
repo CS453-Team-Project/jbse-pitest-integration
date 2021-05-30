@@ -1,10 +1,7 @@
 package com.cs453.group5.examples;
 
-import static jbse.meta.Analysis.assume;
-
 public class Parenthese {
     public int check(char[] arr) {
-        assume(arr.length <= 2);
         int cnt = 0;
         for (int i = 0; i < arr.length; i++) {
             if (arr[i] == '(')

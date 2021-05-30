@@ -1,0 +1,17 @@
+[
+    {
+        "class": "com.cs453.group5.examples.Parenthese",
+        "line": 5,
+        "assume": "arr.length <= 2"
+    },
+    {
+        "class": "com.cs453.group5.examples.Palindrome",
+        "line": 5,
+        "assume": "string.length() <= 1"
+    },
+    {
+        "class": "com.cs453.group5.examples.CharArraySortChecker",
+        "line": 5,
+        "assume": "arr.length <= 2"
+    }
+]
