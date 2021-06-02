@@ -1,23 +1,28 @@
 package com.cs453.group5.symbolic;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
-import com.cs453.group5.symbolic.entities.MutantId;
+import com.cs453.group5.symbolic.entities.ClassBinName;
+import com.cs453.group5.symbolic.entities.ClassInfo;
+import com.cs453.group5.symbolic.executors.CleanBuilder;
+import com.cs453.group5.symbolic.executors.JbseExecutor;
+import com.cs453.group5.symbolic.executors.PathFinderExecutor;
+import com.cs453.group5.symbolic.executors.PitestExecutor;
+import com.cs453.group5.symbolic.managers.ClassFileManager;
+import com.cs453.group5.symbolic.managers.JbseManager;
+import com.cs453.group5.symbolic.managers.MutantManager;
+import com.cs453.group5.symbolic.managers.PathManager;
+import com.cs453.group5.symbolic.parsers.JbseResultParser;
+import com.cs453.group5.symbolic.parsers.MutantDetailsParser;
+import com.cs453.group5.symbolic.parsers.MutationsParser;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 public class SymMain implements Callable<Integer> {
-    private PathManager pathManager = new PathManager();
-
+    // Arguments
     @Parameters(index = "0", description = "Class name with dot syntax (e.g. com.cs453.group5.examples.Calculator)")
     private String classBinaryName;
 
@@ -35,11 +40,8 @@ public class SymMain implements Callable<Integer> {
             "--mutants" }, arity = "1..*", split = ",", description = "Run specific mutants. Parameters are the mutant indexes splitted with `,` (e.g. -m 1,2,3,4,5). The program will not modify the byte code and return pure jbse report.")
     private List<Integer> mutantNumbers;
 
-    // @Option(names = { "-a",
-    // "--assume" }, defaultValue = "my_tool_assume.json", description = "Run jbse
-    // with user assume options (e.g. -a my_tool_assume.json). The program will not
-    // modify the byte code and return pure jbse report.")
-    // private String assumeFile;
+    // Dependencies
+    PathManager pathManager = new PathManager();
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new SymMain()).execute(args);
@@ -52,188 +54,62 @@ public class SymMain implements Callable<Integer> {
         }
 
         if (cleanOpt) {
-            System.out.println("Clean Build");
-            cleanTest();
+            CleanBuilder cleanBuilder = new CleanBuilder();
+
+            int exitcode = cleanBuilder.cleanBuild();
+            if (exitcode != 0) {
+                return -1;
+            }
         }
-        if (!pathManager.checkPIT()) {
-            System.out.println("Running PIT");
-            runPitest();
+
+        Run run = getRunObj();
+        if (run == null) {
+            return -1;
         }
 
         if (originalOpt) {
             if (methods == null || methods.isEmpty()) {
                 System.out.println("\n\n<WARN> No Method specified\n\n");
             } else {
-                runOriginal();
+                run.runOriginal(methods);
             }
         } else if (mutantNumbers != null) {
             if (methods == null || methods.isEmpty()) {
                 System.out.println("\n\n<WARN> No Method specified\n\n");
             } else {
-                runMutants();
+                run.runMutants(mutantNumbers, methods);
             }
         } else {
-            run();
+            run.run(methods);
         }
 
         return 0;
     }
 
-    public void run() {
-        /* Init instances */
-        final MutationsParser mutParser = new MutationsParser(pathManager.getRecentPitestReportPath());
-        final MutantDetailsParser mutDetailParser = new MutantDetailsParser(
-                pathManager.getMutantsDirPath(classBinaryName));
-        final JbseResultParser jbseResultParser = new JbseResultParser(pathManager.getJbseResultsDirPath());
-        final JbseResultParser jbseInfectionResultParser = new JbseResultParser(
-                pathManager.getJbseInfectionResultsDirPath());
-        final JbseResultParser jbseOriginInfectionResultParser = new JbseResultParser(
-                pathManager.getJbseOriginInfectionResultsDirPath());
-        final JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath(),
-                pathManager.getJbseResultsDirPath());
-        final JbseExecutor jbseInfectionExecutor = new JbseExecutor(pathManager.getClassDirPath(),
-                pathManager.getJbseLibPath(), pathManager.getJbseInfectionResultsDirPath());
-        final JbseExecutor jbseOriginInfectionExecutor = new JbseExecutor(pathManager.getClassDirPath(),
-                pathManager.getJbseLibPath(), pathManager.getJbseOriginInfectionResultsDirPath());
-        final PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager.getJbseResultsDirPath());
-        final PathFinderExecutor infectionPathFinderExecutor = new PathFinderExecutor(
-                pathManager.getJbseResultsDirPath());
-        final UserAssume userAssume = new UserAssume(classBinaryName);
-        backupOriginalClass();
-
-        /* For each survived mutant, modify byte code and run */
-        final Set<MutantId> mutIdSet = mutParser.getSurvivedMutantIds();
-        MutantId mutId;
-        int i = 0;
-        while ((mutId = mutDetailParser.getMutantDetails(i++)) != null) {
-            if (mutIdSet.contains(mutId)) {
-                final String mutantClass = mutId.getMutatedClass();
-                final String mutatedMethod = mutId.getMutatedMethod();
-                final String methodSignature = mutId.getMethodDescription();
-                final int mutatedLine = mutId.getLine();
-                int mutantNumber = i - 1;
-
-                if (methods != null && !methods.contains(mutatedMethod)) {
-                    continue;
-                }
-
-                printSurvivedMutant(mutId, mutantNumber);
-
-                applyMutatedClass(mutantNumber);
-                MutantTransformer mutTransformer = new MutantTransformer(mutantClass, mutatedMethod,
-                        pathManager.getClassDirPath(), userAssume);
-                mutTransformer.insertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
-
-                final String classPath = pathManager.classBinNameToPath(mutantClass);
-                jbseExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-                jbseResultParser.extract(mutantNumber, classPath, true);
-
-                try {
-                    String condition = pathFinderExecutor.execFinder(mutantClass, mutatedMethod, mutantNumber);
-                    applyMutatedClass(mutantNumber);
-                    mutTransformer.insertBoth(mutatedLine, condition, "jbse.meta.Analysis.ass3rt(false);");
-
-                    jbseInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-                    jbseInfectionResultParser.extract(mutantNumber, classPath, true);
-
-                    String infectionCondition = infectionPathFinderExecutor.execFinder(mutantClass, mutatedMethod,
-                            mutantNumber);
-
-                    System.out.println("====================================");
-                    System.out.println("run mutant with infection condition");
-                    System.out.println(String.format("user assume class: %s", userAssume.getCommand()));
-                    System.out.println("====================================");
-                    applyMutatedClass(mutantNumber);
-                    mutTransformer.insertBoth(mutatedLine, infectionCondition, "");
-
-                    jbseInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-                    jbseInfectionResultParser.extract(mutantNumber, classPath, false);
-
-                    restoreOriginalClass();
-                    mutTransformer.insertBoth(mutatedLine, infectionCondition, "");
-
-                    jbseOriginInfectionExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-                    jbseOriginInfectionResultParser.extract(mutantNumber, classPath, false);
-
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        restoreOriginalClass();
-    }
-
-    public void runOriginal() {
-        final MutationsParser mutParser = new MutationsParser(pathManager.getRecentPitestReportPath());
-        final JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath(),
-                pathManager.getJbseResultsDirPath());
-
-        final String classPath = pathManager.classBinNameToPath(classBinaryName);
-        for (int i = 0; i < methods.size(); i++) {
-            final String method = methods.get(i);
-            final String methodSignature = mutParser.getMethodSignature(method);
-
-            if (methods.contains(method)) {
-                jbseExecutor.runJbse(-(i + 1), classPath, methodSignature, methods.get(i));
-            }
-        }
-    }
-
-    public void runMutants() {
-        final MutantDetailsParser mutDetailParser = new MutantDetailsParser(
-                pathManager.getMutantsDirPath(classBinaryName));
-        final JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath(),
-                pathManager.getJbseResultsDirPath());
-
-        backupOriginalClass();
-
-        for (int mutantNumber : mutantNumbers) {
-            MutantId mutId = mutDetailParser.getMutantDetails(mutantNumber);
-
-            final String mutantClass = mutId.getMutatedClass();
-            final String mutatedMethod = mutId.getMutatedMethod();
-            final String methodSignature = mutId.getMethodDescription();
-
-            if (methods.contains(mutatedMethod)) {
-                applyMutatedClass(mutantNumber);
-
-                final String classPath = pathManager.classBinNameToPath(mutantClass);
-                jbseExecutor.runJbse(mutantNumber, classPath, methodSignature, mutatedMethod);
-            }
-        }
-
-        restoreOriginalClass();
-    }
-
-    public void runPitest() {
-        final String command = "mvn org.pitest:pitest-maven:mutationCoverage -Dfeatures=+EXPORT";
-        final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command).inheritIO();
-
+    private Run getRunObj() {
+        ClassBinName classBinName = new ClassBinName(classBinaryName);
+        ClassInfo classInfo;
         try {
-            Process process = processBuilder.start();
-            process.waitFor();
-        } catch (IOException e) {
+            classInfo = new ClassInfo(classBinName);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
-    }
 
-    private void cleanTest() {
-        final String command = "mvn clean test";
-        final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command).inheritIO();
+        MutationsParser mutParser = new MutationsParser(pathManager.getPitestBaseDirPath());
+        MutantDetailsParser detailsParser = new MutantDetailsParser(pathManager.getMutantsDirPath(classBinName));
+        PitestExecutor pitExecutor = new PitestExecutor(pathManager.getPitestBaseDirPath());
 
-        try {
-            Process process = processBuilder.start();
-            process.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath());
+        JbseResultParser jbseResultParser = new JbseResultParser();
+        PathFinderExecutor pathFinderExecutor = new PathFinderExecutor();
+
+        PathManager pathManager = new PathManager();
+        ClassFileManager classFileManager = new ClassFileManager(pathManager, classBinName);
+        MutantManager mutantManager = new MutantManager(mutParser, detailsParser, pitExecutor);
+        JbseManager jbseManager = new JbseManager(jbseExecutor, jbseResultParser, pathFinderExecutor);
+
+        return new Run(pathManager, classFileManager, mutantManager, jbseManager, classInfo);
     }
 
     private Boolean checkExecutionValidity() {
@@ -244,56 +120,5 @@ public class SymMain implements Callable<Integer> {
         }
 
         return true;
-    }
-
-    private void backupOriginalClass() {
-        try {
-            String source = pathManager.getClassPath(classBinaryName);
-            String target = pathManager.getBackupClassPath(classBinaryName);
-            copyFile(source, target);
-        } catch (IOException e) {
-            System.err.println(String.format("Original class backup failed: %s.class", classBinaryName));
-            e.printStackTrace();
-        }
-    }
-
-    private void restoreOriginalClass() {
-        try {
-            String source = pathManager.getBackupClassPath(classBinaryName);
-            String target = pathManager.getClassPath(classBinaryName);
-            copyFile(source, target);
-        } catch (IOException e) {
-            System.err.println(String.format("Original class restoring failed: %s.class", classBinaryName));
-            e.printStackTrace();
-        }
-    }
-
-    private void applyMutatedClass(int mutantNumber) {
-        try {
-            String source = pathManager.getMutantClassPath(classBinaryName, mutantNumber);
-            String target = pathManager.getClassPath(classBinaryName);
-            copyFile(source, target);
-        } catch (IOException e) {
-            System.err.println(String.format("Original class restoring failed: %s.class", classBinaryName));
-            e.printStackTrace();
-        }
-    }
-
-    private void copyFile(String sourcePath, String targetPath) throws IOException {
-        Path source = Paths.get(sourcePath);
-        Path target = Paths.get(targetPath);
-
-        if (!Files.exists(target.getParent())) {
-            Files.createDirectories(target.getParent());
-        }
-
-        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    private void printSurvivedMutant(MutantId mutantId, int mutantNumber) {
-        System.out.println("=========================================");
-        System.out.println(String.format("mutant#%d was survived.\n", mutantNumber));
-        System.out.println(mutantId.toString());
-        System.out.println("=========================================\n");
     }
 }

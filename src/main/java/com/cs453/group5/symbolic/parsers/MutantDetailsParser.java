@@ -1,4 +1,4 @@
-package com.cs453.group5.symbolic;
+package com.cs453.group5.symbolic.parsers;
 
 import java.io.File;
 import java.io.FileNotFoundException;

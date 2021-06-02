@@ -11,6 +11,8 @@
     <pitest.version>1.4.3</pitest.version>
     <javaassist.version>3.27.0-GA</javaassist.version>
     <maven-compiler-plugin-version>3.8.1</maven-compiler-plugin-version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencies>

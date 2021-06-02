@@ -1,4 +1,4 @@
-package com.cs453.group5.symbolic;
+package com.cs453.group5.symbolic.executors;
 
 import jbse.apps.run.RunParameters;
 
@@ -7,46 +7,45 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.cs453.group5.symbolic.entities.MethodInfo;
+
 import jbse.apps.run.Run;
 
 public class JbseExecutor {
-    private String mClassDirPath, mJbseLibPath, mOutputDirPath;
+    private String mClassDirPath, mJbseLibPath;
 
-    public JbseExecutor(String classDirPath, String jbseLibPath, String outputDirPath) {
+    public JbseExecutor(String classDirPath, String jbseLibPath) {
         mClassDirPath = classDirPath;
         mJbseLibPath = jbseLibPath;
-        mOutputDirPath = outputDirPath;
     }
 
-    public void runJbse(int id, String classBinaryName, String methodSignature, String methodName) {
+    public void runJbse(String outputPath, MethodInfo methodInfo) {
         RunParameters p = new RunParameters();
 
         try {
-            set(p, id, classBinaryName, methodSignature, methodName);
+            set(p, outputPath, methodInfo);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         Run r = new Run(p);
+        r.out("\\dev\\null");
         r.run();
     }
 
-    private void set(RunParameters p, int id, String classBinaryName, String methodSignature, String methodName)
-            throws IOException {
-        final String outputFilePathStr = String.format("%s/%s/mutant%d.txt", mOutputDirPath, classBinaryName, id);
-
+    private void set(RunParameters p, String outputPath, MethodInfo methodInfo) throws IOException {
         p.addUserClasspath(mClassDirPath);
         p.setJBSELibPath(mJbseLibPath);
 
-        p.setMethodSignature(classBinaryName, methodSignature, methodName);
+        p.setMethodSignature(methodInfo.getClassBinName().getSlash(), methodInfo.getDescriptor(), methodInfo.getName());
         p.setDecisionProcedureType(RunParameters.DecisionProcedureType.Z3);
         p.setExternalDecisionProcedurePath("/opt/local/bin/z3");
-        p.setOutputFilePath(outputFilePathStr);
+        p.setOutputFilePath(outputPath);
         p.setStateFormatMode(RunParameters.StateFormatMode.TEXT);
         p.setStepShowMode(RunParameters.StepShowMode.LEAVES);
 
         /* Create output file path if it does not exist. */
-        Path outputFilePath = Paths.get(outputFilePathStr);
+        Path outputFilePath = Paths.get(outputPath);
         if (!Files.exists(outputFilePath.getParent())) {
             Files.createDirectories(outputFilePath.getParent());
         }

@@ -1,4 +1,4 @@
-package com.cs453.group5.symbolic;
+package com.cs453.group5.symbolic.parsers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,12 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JbseResultParser {
-  private String jbseResultsDirPath;
-
-  public JbseResultParser(String jbseResultsDirPath) {
-    this.jbseResultsDirPath = jbseResultsDirPath;
-  }
-
   public static Boolean isStartingPoint(String st) {
     if (st.isEmpty()) {
       return false;
@@ -26,16 +20,13 @@ public class JbseResultParser {
 
   public static Boolean isViolated(String st, boolean violation) {
     if (violation) {
-
       return st.contains("path violates an assertion.");
     } else {
       return st.contains("path is safe.");
     }
   }
 
-  public void extract(int id, String classBinaryName, boolean violation) {
-    String targetPath = String.format("%s/%s/mutant%d.txt", jbseResultsDirPath, classBinaryName, id);
-
+  public void extract(String targetPath, boolean violation) {
     try {
       File file = new File(targetPath);
       BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
@@ -53,7 +44,6 @@ public class JbseResultParser {
             if (isViolated(line, violation)) {
               start = false;
               stringBuffer.append(line + "\n\n");
-              System.out.println(stringBuffer.toString());
               readData.add(stringBuffer.toString());
             }
             stringBuffer.delete(0, stringBuffer.length());
