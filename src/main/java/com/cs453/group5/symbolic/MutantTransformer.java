@@ -90,8 +90,6 @@ public class MutantTransformer {
       // Insert user custom assume option
       if (userAssume.getLine() != -1) {
         userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
-        System.out.println(userCommand);
-        // m.insertBefore(userCommand);
         m.insertAt(userAssume.getLine(), true, userCommand);
       }
 

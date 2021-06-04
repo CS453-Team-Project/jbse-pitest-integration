@@ -28,6 +28,11 @@ public class ClassFileManager {
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 
+    /**
+     * Backup original class file. It can be restored by restorOriginalClass.
+     * 
+     * @see #restoreOriginalClass()
+     */
     public void backupOriginalClass() {
         try {
             String source = pathManager.getClassPath(classBinName);
@@ -39,6 +44,11 @@ public class ClassFileManager {
         }
     }
 
+    /**
+     * Restore original class file. It may be backuped by backupOriginalClass.
+     * 
+     * @see #backupOriginalClass()
+     */
     public void restoreOriginalClass() {
         try {
             String source = pathManager.getBackupClassPath(classBinName);
@@ -51,6 +61,11 @@ public class ClassFileManager {
         }
     }
 
+    /**
+     * Change class file to mutated class file.
+     * 
+     * @param mutantNumber
+     */
     public void applyMutatedClass(int mutantNumber) {
         try {
             String source = pathManager.getMutantClassPath(classBinName, mutantNumber);
