@@ -21,6 +21,7 @@ public class MutantManager {
     }
 
     public Map<Integer, MutantId> getAliveMutants() {
+        // TODO: Map<String, Pair<Integer, MutantId>>
         Map<Integer, MutantId> result = new HashMap<Integer, MutantId>();
 
         if (!pitExecutor.pitReportExists()) {

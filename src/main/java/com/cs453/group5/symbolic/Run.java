@@ -40,7 +40,6 @@ public class Run {
     }
 
     public void run(List<String> methodNames) {
-
         // Backup original class
         classFileManager.backupOriginalClass();
 
@@ -49,7 +48,10 @@ public class Run {
         List<Map.Entry<Integer, MutantId>> mutantsWithNumber = aliveMutantIds.entrySet().stream()
                 .collect(Collectors.toList());
 
+        // TODO: new for loop for method
         for (Map.Entry<Integer, MutantId> mutNum : mutantsWithNumber) {
+            // TODO: run original
+            // TODO: new for loop for mutant number
             int mutantNumber = mutNum.getKey();
             MutantId mutId = mutNum.getValue();
 
@@ -92,10 +94,13 @@ public class Run {
             javssManager.insert(methodInfo, infectionCond);
             jbseManager.runAndExtract(methodInfo, jbsePPath, false);
 
+            // TODO: Remove this part
             // origin
             classFileManager.restoreOriginalClass();
             javssManager.insert(methodInfo, infectionCond);
             jbseManager.runAndExtract(methodInfo, jbseOPath, false);
+
+            // TODO: Call kill mutant
         }
 
         classFileManager.restoreOriginalClass();

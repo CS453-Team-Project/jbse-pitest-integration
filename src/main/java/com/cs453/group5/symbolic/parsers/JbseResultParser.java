@@ -51,6 +51,7 @@ public class JbseResultParser {
             if (isViolated(line, violation)) {
               start = false;
               stringBuffer.append(line + "\n\n");
+              // TODO: Write new file with index
               readData.add(stringBuffer.toString());
             }
             stringBuffer.delete(0, stringBuffer.length());

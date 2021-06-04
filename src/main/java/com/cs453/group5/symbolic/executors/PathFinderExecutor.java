@@ -20,6 +20,7 @@ public class PathFinderExecutor {
     public String findPathCond(String jbseResultPath, MethodInfo methodInfo) {
         String classPath = methodInfo.getClassBinName().getSlash();
 
+        // TODO: Change command building
         final String command = String.format("python3 parse-jbse-output/src/main.py -t \"%s\" -m \"%s:%s:%s:%s\"",
                 jbseResultPath, classPath, methodInfo.getName(), methodInfo.getDescriptor(),
                 String.join(":", methodInfo.getParamNames()));
@@ -34,6 +35,8 @@ public class PathFinderExecutor {
             return result;
         }
     }
+
+    // TODO: new method: Kill Mutant
 
     private String parsePathCondDeprecated1(String[] output) {
         String result = null;
