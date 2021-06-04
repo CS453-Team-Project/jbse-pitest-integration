@@ -9,6 +9,9 @@ import javassist.NotFoundException;
 import javassist.CannotCompileException;
 import java.io.IOException;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class MutantTransformer {
   private final String targetClass;
   private final String targetMethod;
@@ -43,11 +46,14 @@ public class MutantTransformer {
     try {
       m.insertAt(lineno, true, command);
       // Insert user custom assume option
-      if (userAssume.getLine() != -1) {
-        userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
-        m.insertBefore(userCommand);
+      JSONArray userAssumes = userAssume.getAssumes();
+      if (userAssumes != null) {
+        for (int i = 0; i < userAssumes.length(); i++) {
+          JSONObject assumeInfo = userAssumes.getJSONObject(i);
+          userCommand = String.format("jbse.meta.Analysis.assume(%s);", assumeInfo.getString("assume"));
+          m.insertAt(assumeInfo.getInt("line"), true, userCommand);
+        }
       }
-
       // Write class file
       cc.writeFile(this.saveDirPath);
       cc.detach();
@@ -88,11 +94,13 @@ public class MutantTransformer {
         m.insertAt(lineno + 1, true, command);
       }
       // Insert user custom assume option
-      if (userAssume.getLine() != -1) {
-        userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
-        System.out.println(userCommand);
-        // m.insertBefore(userCommand);
-        m.insertAt(userAssume.getLine(), true, userCommand);
+      JSONArray userAssumes = userAssume.getAssumes();
+      if (userAssumes != null) {
+        for (int i = 0; i < userAssumes.length(); i++) {
+          JSONObject assumeInfo = userAssumes.getJSONObject(i);
+          userCommand = String.format("jbse.meta.Analysis.assume(%s);", assumeInfo.getString("assume"));
+          m.insertAt(assumeInfo.getInt("line"), true, userCommand);
+        }
       }
 
       // Write class file

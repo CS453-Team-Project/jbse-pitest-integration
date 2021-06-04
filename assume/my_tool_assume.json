@@ -1,22 +1,51 @@
 [
     {
         "class": "com.cs453.group5.examples.Parenthese",
-        "line": 5,
-        "assume": "arr.length <= 3"
+        "assume": [
+            {
+                "line": 5,
+                "assume": "arr.length <= 3"
+            }
+        ]
     },
     {
         "class": "com.cs453.group5.examples.Palindrome",
-        "line": 5,
-        "assume": "string.length() <= 1"
+        "assumes": [
+            {
+                "line": 5,
+                "assume": "string.length() <= 1"
+            }
+        ]
     },
     {
         "class": "com.cs453.group5.examples.CharArraySortChecker",
-        "line": 5,
-        "assume": "arr.length <= 1"
+        "assumes": [
+            {
+                "line": 5,
+                "assume": "arr.length <= 1"
+            }
+        ]
     },
     {
         "class": "com.cs453.group5.examples.TargetNumber",
-        "line": 5,
-        "assume": "arr.length <= 3"
+        "assumes": [
+            {
+                "line": 5,
+                "assume": "arr.length <= 3"
+            }
+        ]
+    },
+    {
+        "class": "com.cs453.group5.examples.PassingTruck",
+        "assumes": [
+            {
+                "line": 19,
+                "assume": "truck_weights.length <= 3"
+            },
+            {
+                "line": 19,
+                "assume": "bridge_length <= 2"
+            }
+        ]
     }
 ]

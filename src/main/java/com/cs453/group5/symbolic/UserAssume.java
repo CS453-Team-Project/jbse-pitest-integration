@@ -47,18 +47,25 @@ public class UserAssume {
         }
     }
 
-    public int getLine() {
-        if (this.jsonObject == null) {
-            return -1;
-        }
-        return this.jsonObject.getInt("line");
-    }
+    // public int getLine() {
+    // if (this.jsonObject == null) {
+    // return -1;
+    // }
+    // return this.jsonObject.getInt("line");
+    // }
 
-    public String getCommand() {
+    // public String getCommand() {
+    // if (this.jsonObject == null) {
+    // return "";
+    // }
+    // String command = this.jsonObject.getString("assume");
+    // return command;
+    // }
+
+    public JSONArray getAssumes() {
         if (this.jsonObject == null) {
-            return "";
+            return null;
         }
-        String command = this.jsonObject.getString("assume");
-        return command;
+        return this.jsonObject.getJSONArray("assumes");
     }
 }
