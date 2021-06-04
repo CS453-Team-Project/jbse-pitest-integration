@@ -26,6 +26,8 @@ public class PathManager {
     private final String jbseResultsDirPath = String.format("%s/target/jbse-results/%s", projectHome, timestamp);
     private final String jbseLibPath = String.format("%s/res/jbse-0.10.0-SNAPSHOT-shaded.jar", projectHome);
 
+    private final String userAssumePath = String.format("%s/assume/my_tool_assume.json", projectHome);
+
     public Boolean isProjectHome() {
         final String currDir = System.getProperty("user.dir");
         return currDir.equals(projectHome) || currDir.equals(projectHome + "/") || (currDir + "/").equals(projectHome);
@@ -66,5 +68,9 @@ public class PathManager {
 
     public String getJbseLibPath() {
         return jbseLibPath;
+    }
+
+    public String getUserAssumePath() {
+        return userAssumePath;
     }
 }

@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.cs453.group5.symbolic.entities.Assertion;
+import com.cs453.group5.symbolic.entities.Assumption;
 import com.cs453.group5.symbolic.entities.ClassBinName;
 import com.cs453.group5.symbolic.entities.ClassInfo;
 import com.cs453.group5.symbolic.entities.MethodInfo;
 import com.cs453.group5.symbolic.entities.MutantId;
+import com.cs453.group5.symbolic.exceptions.IllegalPathFinderOutputException;
 import com.cs453.group5.symbolic.managers.ClassFileManager;
 import com.cs453.group5.symbolic.managers.JbseManager;
 import com.cs453.group5.symbolic.managers.MutantManager;
@@ -21,21 +24,22 @@ public class Run {
     ClassFileManager classFileManager;
     MutantManager mutantManager;
     JbseManager jbseManager;
+    JavassistManager javssManager;
 
     public Run(PathManager pathManager, ClassFileManager classFileManager, MutantManager mutantManager,
-            JbseManager jbseManager, ClassInfo classInfo) {
+            JbseManager jbseManager, JavassistManager javssManager, ClassInfo classInfo) {
 
         this.pathManager = pathManager;
         this.classFileManager = classFileManager;
         this.mutantManager = mutantManager;
         this.jbseManager = jbseManager;
+        this.javssManager = javssManager;
         this.classInfo = classInfo;
 
         this.classBinName = classInfo.getBinaryName();
     }
 
     public void run(List<String> methodNames) {
-        final UserAssume userAssume = new UserAssume(classBinName.getDot());
 
         // Backup original class
         classFileManager.backupOriginalClass();
@@ -55,6 +59,8 @@ public class Run {
             }
 
             final int mutatedLine = mutId.getLine();
+            final Assertion falseAssert = new Assertion(mutatedLine, "false");
+            final Assertion falseAssertAfter = new Assertion(mutatedLine + 1, "false");
             final MethodInfo methodInfo = classInfo.getMethodInfo(mutatedMethod);
 
             final String jbseRPath = pathManager.getJbseResultPath(classBinName, "reachability", mutantNumber);
@@ -62,23 +68,20 @@ public class Run {
             final String jbsePPath = pathManager.getJbseResultPath(classBinName, "propagation", mutantNumber);
             final String jbseOPath = pathManager.getJbseResultPath(classBinName, "origin", mutantNumber);
 
-            MutantTransformer mutTransformer = new MutantTransformer(classBinName.getDot(), mutatedMethod,
-                    pathManager.getClassDirPath(), userAssume);
-
             // Finding R condition
             classFileManager.applyMutatedClass(mutantNumber);
-            mutTransformer.insertBytecode(mutatedLine, "jbse.meta.Analysis.ass3rt(false);");
+            javssManager.insert(methodInfo, falseAssert);
             jbseManager.runAndExtract(methodInfo, jbseRPath, true);
-            String reachabilityCond = jbseManager.findPathCond(methodInfo, jbseRPath);
+            Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, jbseRPath);
 
             // Finding I condition
             classFileManager.applyMutatedClass(mutantNumber);
-            mutTransformer.insertBoth(mutatedLine, reachabilityCond, "jbse.meta.Analysis.ass3rt(false);");
+            javssManager.insert(methodInfo, falseAssertAfter, reachabilityCond);
             jbseManager.runAndExtract(methodInfo, jbseIPath, true);
-            String infectionCond;
+            Assumption infectionCond;
             try {
                 infectionCond = jbseManager.findPathCond(methodInfo, jbseIPath);
-            } catch (Exception e) {
+            } catch (IllegalPathFinderOutputException e) {
                 System.out.println("No infection condition. Proceed with reachability condition.");
                 infectionCond = reachabilityCond;
             }
@@ -86,12 +89,12 @@ public class Run {
             // Comparing mutant and origin
             // mutant
             classFileManager.applyMutatedClass(mutantNumber);
-            mutTransformer.insertBoth(mutatedLine, infectionCond, "");
+            javssManager.insert(methodInfo, infectionCond);
             jbseManager.runAndExtract(methodInfo, jbsePPath, false);
 
             // origin
             classFileManager.restoreOriginalClass();
-            mutTransformer.insertBoth(mutatedLine, infectionCond, "");
+            javssManager.insert(methodInfo, infectionCond);
             jbseManager.runAndExtract(methodInfo, jbseOPath, false);
         }
 

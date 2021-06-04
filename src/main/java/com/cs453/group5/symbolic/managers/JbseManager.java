@@ -1,5 +1,6 @@
 package com.cs453.group5.symbolic.managers;
 
+import com.cs453.group5.symbolic.entities.Assumption;
 import com.cs453.group5.symbolic.entities.MethodInfo;
 import com.cs453.group5.symbolic.executors.JbseExecutor;
 import com.cs453.group5.symbolic.executors.PathFinderExecutor;
@@ -46,7 +47,7 @@ public class JbseManager {
      * @param jbseResultPath
      * @return
      */
-    public String findPathCond(MethodInfo methodInfo, String jbseResultPath) {
-        return pathFinderExecutor.findPathCond(jbseResultPath, methodInfo);
+    public Assumption findPathCond(MethodInfo methodInfo, String jbseResultPath) {
+        return new Assumption(0, pathFinderExecutor.findPathCond(jbseResultPath, methodInfo));
     }
 }

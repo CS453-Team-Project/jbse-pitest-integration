@@ -7,6 +7,7 @@ import com.cs453.group5.symbolic.entities.ClassBinName;
 import com.cs453.group5.symbolic.entities.ClassInfo;
 import com.cs453.group5.symbolic.executors.CleanBuilder;
 import com.cs453.group5.symbolic.executors.JbseExecutor;
+import com.cs453.group5.symbolic.executors.MutantTransformer;
 import com.cs453.group5.symbolic.executors.PathFinderExecutor;
 import com.cs453.group5.symbolic.executors.PitestExecutor;
 import com.cs453.group5.symbolic.managers.ClassFileManager;
@@ -16,6 +17,7 @@ import com.cs453.group5.symbolic.managers.PathManager;
 import com.cs453.group5.symbolic.parsers.JbseResultParser;
 import com.cs453.group5.symbolic.parsers.MutantDetailsParser;
 import com.cs453.group5.symbolic.parsers.MutationsParser;
+import com.cs453.group5.symbolic.parsers.UserAssumeParser;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -94,12 +96,16 @@ public class SymMain implements Callable<Integer> {
         JbseResultParser jbseResultParser = new JbseResultParser();
         PathFinderExecutor pathFinderExecutor = new PathFinderExecutor();
 
+        UserAssumeParser assumeParser = new UserAssumeParser(pathManager.getUserAssumePath(), classBinName);
+        MutantTransformer mutTransformer = new MutantTransformer(pathManager.getClassDirPath());
+
         PathManager pathManager = new PathManager();
         ClassFileManager classFileManager = new ClassFileManager(pathManager, classBinName);
         MutantManager mutantManager = new MutantManager(mutParser, detailsParser, pitExecutor);
         JbseManager jbseManager = new JbseManager(jbseExecutor, jbseResultParser, pathFinderExecutor);
+        JavassistManager javssManager = new JavassistManager(assumeParser, mutTransformer);
 
-        return new Run(pathManager, classFileManager, mutantManager, jbseManager, classInfo);
+        return new Run(pathManager, classFileManager, mutantManager, jbseManager, javssManager, classInfo);
     }
 
     private void checkExecutionValidity() {
