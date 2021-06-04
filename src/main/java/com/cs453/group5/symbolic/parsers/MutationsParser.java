@@ -89,6 +89,11 @@ public class MutationsParser {
         return new MutantId(mutatedClass, mutatedMethod, methodDescription, mutator, index, block, lineNumber);
     }
 
+    /**
+     * Parse pitest report and return survived mutants
+     * 
+     * @return Set of survived mutant's mutant id
+     */
     public Set<MutantId> getSurvivedMutantIds() {
         if (xmlPath == null) {
             xmlPath = getRecentPitestReportPath();
