@@ -53,6 +53,8 @@ public class Run {
         for (String method : methods) {
             runOriginal(method, false);
 
+            final String methodPath = pathManager.getJbseMethodPath(classBinName, method);
+
             List<Pair<Integer, MutantId>> pairs = aliveMutantIds.get(method);
             for (Pair<Integer, MutantId> pair : pairs) {
                 int mutantNumber = pair.getFirst();
@@ -71,7 +73,7 @@ public class Run {
                 classFileManager.applyMutatedClass(mutantNumber);
                 javssManager.insert(methodInfo, falseAssert);
                 jbseManager.runAndExtract(methodInfo, jbsePath, true);
-                Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, jbsePath);
+                Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, methodPath);
 
                 // Finding I condition
                 classFileManager.applyMutatedClass(mutantNumber);
@@ -79,7 +81,7 @@ public class Run {
                 jbseManager.runAndExtract(methodInfo, jbsePath, true);
                 Assumption infectionCond;
                 try {
-                    infectionCond = jbseManager.findPathCond(methodInfo, jbsePath);
+                    infectionCond = jbseManager.findPathCond(methodInfo, methodPath);
                 } catch (IllegalPathFinderOutputException e) {
                     System.out.println("No infection condition. Proceed with reachability condition.");
                     infectionCond = reachabilityCond;

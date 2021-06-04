@@ -47,4 +47,13 @@ public class MethodInfo {
     public String[] getParamNames() {
         return paramNames;
     }
+
+    /**
+     * 
+     * @return Method dump string
+     */
+    public String dumpString() {
+        return String.format("%s:%s:%s:%s", classBinName.getSlash(), methodName, descriptor,
+                String.join(":", paramNames));
+    }
 }

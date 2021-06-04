@@ -66,6 +66,10 @@ public class PathManager {
                 mutantNumber);
     }
 
+    public String getJbseMethodPath(ClassBinName classBinName, String subdir) {
+        return String.format("%s/%s/%s", jbseResultsDirPath, classBinName.getSlash(), subdir);
+    }
+
     public String getJbseLibPath() {
         return jbseLibPath;
     }

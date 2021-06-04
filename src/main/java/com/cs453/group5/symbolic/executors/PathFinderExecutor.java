@@ -1,6 +1,10 @@
 package com.cs453.group5.symbolic.executors;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +21,12 @@ public class PathFinderExecutor {
      * @param methodInfo
      * @return JAVA syntax condition of certain path
      */
-    public String findPathCond(String jbseResultPath, MethodInfo methodInfo) {
-        String classPath = methodInfo.getClassBinName().getSlash();
-
+    public String findPathCond(String jbseMethodPath, MethodInfo methodInfo) {
         // TODO: Change command building
-        final String command = String.format("python3 parse-jbse-output/src/main.py -t \"%s\" -m \"%s:%s:%s:%s\"",
-                jbseResultPath, classPath, methodInfo.getName(), methodInfo.getDescriptor(),
-                String.join(":", methodInfo.getParamNames()));
+        makeMethodsTxt(methodInfo, jbseMethodPath);
+
+        final String command = String.format("python3 parse-jbse-output/src/main.py -t \"%s\" -m \"%s\"",
+                jbseMethodPath, methodInfo.dumpString());
         System.out.println(command);
 
         String[] output = runPathFinder(command);
@@ -71,5 +74,22 @@ public class PathFinderExecutor {
         }
 
         return result.toArray(new String[0]);
+    }
+
+    private void makeMethodsTxt(MethodInfo methodInfo, String path) {
+        String methodsPath = path + "/methods.txt";
+
+        File txtFile = new File(methodsPath);
+
+        if (!txtFile.exists()) {
+            try {
+                BufferedWriter pathWriter = new BufferedWriter(new FileWriter(txtFile));
+                pathWriter.write(methodInfo.dumpString());
+                pathWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("IOException while writing " + methodsPath);
+            }
+        }
     }
 }

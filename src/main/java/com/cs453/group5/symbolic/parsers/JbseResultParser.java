@@ -35,7 +35,6 @@ public class JbseResultParser {
    */
   public void extract(String targetPath, boolean violation) {
     try {
-      int index = 0;
       File file = new File(targetPath);
       BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 
