@@ -2,6 +2,7 @@ package com.cs453.group5.symbolic;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.cs453.group5.symbolic.entities.Assertion;
@@ -10,6 +11,7 @@ import com.cs453.group5.symbolic.entities.ClassBinName;
 import com.cs453.group5.symbolic.entities.ClassInfo;
 import com.cs453.group5.symbolic.entities.MethodInfo;
 import com.cs453.group5.symbolic.entities.MutantId;
+import com.cs453.group5.symbolic.entities.Pair;
 import com.cs453.group5.symbolic.exceptions.IllegalPathFinderOutputException;
 import com.cs453.group5.symbolic.managers.ClassFileManager;
 import com.cs453.group5.symbolic.managers.JbseManager;
@@ -39,68 +41,66 @@ public class Run {
         this.classBinName = classInfo.getBinaryName();
     }
 
-    public void run(List<String> methodNames) {
+    public void run(List<String> specifiedMethods) {
         // Backup original class
         classFileManager.backupOriginalClass();
 
         // Get alived Mutants
-        Map<Integer, MutantId> aliveMutantIds = mutantManager.getAliveMutants();
-        List<Map.Entry<Integer, MutantId>> mutantsWithNumber = aliveMutantIds.entrySet().stream()
-                .collect(Collectors.toList());
+        Map<String, List<Pair<Integer, MutantId>>> aliveMutantIds = mutantManager.getAliveMutants();
+        Set<String> methods = aliveMutantIds.keySet().stream()
+                .filter((m) -> specifiedMethods == null || specifiedMethods.contains(m)).collect(Collectors.toSet());
 
-        // TODO: new for loop for method
-        for (Map.Entry<Integer, MutantId> mutNum : mutantsWithNumber) {
+        for (String method : methods) {
             // TODO: run original
-            // TODO: new for loop for mutant number
-            int mutantNumber = mutNum.getKey();
-            MutantId mutId = mutNum.getValue();
+            List<Pair<Integer, MutantId>> pairs = aliveMutantIds.get(method);
 
-            final String mutatedMethod = mutId.getMutatedMethod();
-            if (methodNames != null && !methodNames.contains(mutatedMethod)) {
-                continue;
+            for (Pair<Integer, MutantId> pair : pairs) {
+                int mutantNumber = pair.getFirst();
+                MutantId mutId = pair.getSecond();
+
+                final int mutatedLine = mutId.getLine();
+                final MethodInfo methodInfo = classInfo.getMethodInfo(method);
+
+                final Assertion falseAssert = new Assertion(mutatedLine, "false");
+                final Assertion falseAssertAfter = new Assertion(mutatedLine + 1, "false");
+
+                final String jbseRPath = pathManager.getJbseResultPath(classBinName, "reachability", mutantNumber);
+                final String jbseIPath = pathManager.getJbseResultPath(classBinName, "infection", mutantNumber);
+                final String jbsePPath = pathManager.getJbseResultPath(classBinName, "propagation", mutantNumber);
+                final String jbseOPath = pathManager.getJbseResultPath(classBinName, "origin", mutantNumber);
+
+                // Finding R condition
+                classFileManager.applyMutatedClass(mutantNumber);
+                javssManager.insert(methodInfo, falseAssert);
+                jbseManager.runAndExtract(methodInfo, jbseRPath, true);
+                Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, jbseRPath);
+
+                // Finding I condition
+                classFileManager.applyMutatedClass(mutantNumber);
+                javssManager.insert(methodInfo, falseAssertAfter, reachabilityCond);
+                jbseManager.runAndExtract(methodInfo, jbseIPath, true);
+                Assumption infectionCond;
+                try {
+                    infectionCond = jbseManager.findPathCond(methodInfo, jbseIPath);
+                } catch (IllegalPathFinderOutputException e) {
+                    System.out.println("No infection condition. Proceed with reachability condition.");
+                    infectionCond = reachabilityCond;
+                }
+
+                // Comparing mutant and origin
+                // mutant
+                classFileManager.applyMutatedClass(mutantNumber);
+                javssManager.insert(methodInfo, infectionCond);
+                jbseManager.runAndExtract(methodInfo, jbsePPath, false);
+
+                // TODO: Remove this part
+                // origin
+                classFileManager.restoreOriginalClass();
+                javssManager.insert(methodInfo, infectionCond);
+                jbseManager.runAndExtract(methodInfo, jbseOPath, false);
+
+                // TODO: Call kill mutant
             }
-
-            final int mutatedLine = mutId.getLine();
-            final Assertion falseAssert = new Assertion(mutatedLine, "false");
-            final Assertion falseAssertAfter = new Assertion(mutatedLine + 1, "false");
-            final MethodInfo methodInfo = classInfo.getMethodInfo(mutatedMethod);
-
-            final String jbseRPath = pathManager.getJbseResultPath(classBinName, "reachability", mutantNumber);
-            final String jbseIPath = pathManager.getJbseResultPath(classBinName, "infection", mutantNumber);
-            final String jbsePPath = pathManager.getJbseResultPath(classBinName, "propagation", mutantNumber);
-            final String jbseOPath = pathManager.getJbseResultPath(classBinName, "origin", mutantNumber);
-
-            // Finding R condition
-            classFileManager.applyMutatedClass(mutantNumber);
-            javssManager.insert(methodInfo, falseAssert);
-            jbseManager.runAndExtract(methodInfo, jbseRPath, true);
-            Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, jbseRPath);
-
-            // Finding I condition
-            classFileManager.applyMutatedClass(mutantNumber);
-            javssManager.insert(methodInfo, falseAssertAfter, reachabilityCond);
-            jbseManager.runAndExtract(methodInfo, jbseIPath, true);
-            Assumption infectionCond;
-            try {
-                infectionCond = jbseManager.findPathCond(methodInfo, jbseIPath);
-            } catch (IllegalPathFinderOutputException e) {
-                System.out.println("No infection condition. Proceed with reachability condition.");
-                infectionCond = reachabilityCond;
-            }
-
-            // Comparing mutant and origin
-            // mutant
-            classFileManager.applyMutatedClass(mutantNumber);
-            javssManager.insert(methodInfo, infectionCond);
-            jbseManager.runAndExtract(methodInfo, jbsePPath, false);
-
-            // TODO: Remove this part
-            // origin
-            classFileManager.restoreOriginalClass();
-            javssManager.insert(methodInfo, infectionCond);
-            jbseManager.runAndExtract(methodInfo, jbseOPath, false);
-
-            // TODO: Call kill mutant
         }
 
         classFileManager.restoreOriginalClass();

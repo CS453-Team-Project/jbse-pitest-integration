@@ -1,10 +1,15 @@
 package com.cs453.group5.symbolic.managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.cs453.group5.symbolic.entities.MutantId;
+import com.cs453.group5.symbolic.entities.Pair;
 import com.cs453.group5.symbolic.executors.PitestExecutor;
 import com.cs453.group5.symbolic.parsers.MutantDetailsParser;
 import com.cs453.group5.symbolic.parsers.MutationsParser;
@@ -20,20 +25,27 @@ public class MutantManager {
         this.pitExecutor = pitExecutor;
     }
 
-    public Map<Integer, MutantId> getAliveMutants() {
-        // TODO: Map<String, Pair<Integer, MutantId>>
-        Map<Integer, MutantId> result = new HashMap<Integer, MutantId>();
+    public Map<String, List<Pair<Integer, MutantId>>> getAliveMutants() {
+        Map<String, List<Pair<Integer, MutantId>>> result = new HashMap<>();
 
         if (!pitExecutor.pitReportExists()) {
             pitExecutor.runPitest();
         }
 
-        Set<MutantId> mutIdSet = mutParser.getSurvivedMutantIds();
-        MutantId mutId;
-        int i = 0;
-        while ((mutId = detailsParser.getMutantDetails(i++)) != null) {
-            if (mutIdSet.contains(mutId)) {
-                result.put(i - 1, mutId);
+        Set<MutantId> survivedMutIdSet = mutParser.getSurvivedMutantIds();
+        List<Pair<Integer, MutantId>> mutIds = detailsParser.getAllMutantDetails();
+
+        List<Pair<Integer, MutantId>> survivedPairs = mutIds.stream()
+                .filter((p) -> survivedMutIdSet.contains(p.getSecond())).collect(Collectors.toList());
+
+        for (Pair<Integer, MutantId> pair : survivedPairs) {
+            String method = pair.getSecond().getMutatedMethod();
+            List<Pair<Integer, MutantId>> item = result.get(method);
+
+            if (item == null) {
+                result.put(method, new ArrayList<>(Arrays.asList(pair)));
+            } else {
+                item.add(pair);
             }
         }
 
