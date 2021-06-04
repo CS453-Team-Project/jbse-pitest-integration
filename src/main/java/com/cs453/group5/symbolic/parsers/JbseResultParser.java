@@ -35,6 +35,7 @@ public class JbseResultParser {
    */
   public void extract(String targetPath, boolean violation) {
     try {
+      int index = 0;
       File file = new File(targetPath);
       BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 
@@ -51,7 +52,7 @@ public class JbseResultParser {
             if (isViolated(line, violation)) {
               start = false;
               stringBuffer.append(line + "\n\n");
-              // TODO: Write new file with index
+
               readData.add(stringBuffer.toString());
             }
             stringBuffer.delete(0, stringBuffer.length());
@@ -69,15 +70,20 @@ public class JbseResultParser {
       BufferedWriter clear = new BufferedWriter(new FileWriter(file));
       clear.close();
 
-      // write the violation data
-      BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-      for (String data : readData) {
-        bufferedWriter.write(data.toString());
+      for (int i = 0; i < readData.toArray().length; i++) {
+        File pathFile = new File(changePath(targetPath, String.format("path%d.txt", i)));
+        BufferedWriter pathWriter = new BufferedWriter(new FileWriter(pathFile));
+
+        pathWriter.write(readData.get(i).toString());
+        pathWriter.close();
       }
 
+      // remove the targetPath file
+      file.delete();
+
       // close the buffer
-      bufferedWriter.close();
       bufferedReader.close();
+
     } catch (FileNotFoundException e) {
       e.printStackTrace();
       throw new RuntimeException("Jbse result not found: " + targetPath);
@@ -85,5 +91,12 @@ public class JbseResultParser {
       e.printStackTrace();
       throw new RuntimeException("IOException");
     }
+  }
+
+  String changePath(String targetPath, String fileName) {
+    String[] targetPathList = targetPath.split("/");
+    targetPathList[targetPathList.length - 1] = fileName;
+
+    return String.join("/", targetPathList);
   }
 }
