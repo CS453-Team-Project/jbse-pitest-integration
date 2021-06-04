@@ -21,21 +21,57 @@ public class PathFinderExecutor {
      * @param methodInfo
      * @return JAVA syntax condition of certain path
      */
-    public String findPathCond(String jbseMethodPath, MethodInfo methodInfo) {
-        // TODO: Change command building
+    public String findPathCond(String jbseMethodPath, MethodInfo methodInfo, int mutantId) {
         makeMethodsTxt(methodInfo, jbseMethodPath);
+        File dir = new File(jbseMethodPath + "/mutants/" + mutantId);
+        File[] pathList = dir.listFiles();
+        ArrayList<String> condition = new ArrayList<String>();
 
-        final String command = String.format("python3 parse-jbse-output/src/main.py -t \"%s\" -m \"%s\"",
-                jbseMethodPath, methodInfo.dumpString());
-        System.out.println(command);
+        if (pathList.length == 0) {
+            throw new IllegalPathFinderOutputException();
+        }
 
-        String[] output = runPathFinder(command);
-        String result = parsePathCondDeprecated1(output);
+        for (int i = 0; i < pathList.length; i++) {
+            final String command = String.format(
+                    "python3 parse-jbse-output/src/main.py -a parse -p %s -m %d -f \"path%d.txt\"", jbseMethodPath,
+                    mutantId, i);
+            System.out.println(command);
+            String[] output = runPathFinder(command);
+            String result = parsePathCondDeprecated1(output);
 
-        if (result.equals("True")) {
-            return "true";
-        } else {
-            return result;
+            condition.add(result);
+        }
+        String result = String.join(" || ", condition);
+        System.out.println(result);
+        return result;
+    }
+
+    public void findKillCond(String jbseMethodPath, MethodInfo methodInfo, int mutantId) {
+        makeMethodsTxt(methodInfo, jbseMethodPath);
+        File dir = new File(jbseMethodPath + "/mutants/" + mutantId);
+        File[] pathList = dir.listFiles();
+
+        if (pathList.length == 0) {
+            throw new IllegalPathFinderOutputException();
+        }
+
+        for (int i = 0; i < pathList.length; i++) {
+            final String command = String.format(
+                    "python3 parse-jbse-output/src/main.py -a kill -p %s -m %d -f \"path%d.txt\"", jbseMethodPath,
+                    mutantId, i);
+            System.out.println(command);
+            String[] output = runPathFinder(command);
+            System.out.println(String.join("\n", output));
+
+            try {
+                BufferedWriter pathWriter = new BufferedWriter(
+                        new FileWriter("/root/jbse-pitest-integration/kill_cond.txt", true));
+
+                pathWriter.write(String.join("\n", output) + "\n\n");
+                pathWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -52,7 +88,11 @@ public class PathFinderExecutor {
             throw new IllegalPathFinderOutputException();
         }
 
-        return result;
+        if (result.equals("True")) {
+            return "true";
+        }
+
+        return String.format("(%s)", result);
     }
 
     private String[] runPathFinder(String command) {
@@ -64,7 +104,10 @@ public class PathFinderExecutor {
             Process process = processBuilder.start();
 
             BufferedReader outReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            result.add(outReader.readLine());
+            String line;
+            while ((line = outReader.readLine()) != null) {
+                result.add(line);
+            }
 
             process.waitFor();
         } catch (Exception e) {

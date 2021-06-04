@@ -69,6 +69,9 @@ public class JbseResultParser {
       BufferedWriter clear = new BufferedWriter(new FileWriter(file));
       clear.close();
 
+      // clear whole path blocks in directory
+      clearPathBlock(targetPath);
+
       for (int i = 0; i < readData.toArray().length; i++) {
         File pathFile = new File(changePath(targetPath, String.format("path%d.txt", i)));
         BufferedWriter pathWriter = new BufferedWriter(new FileWriter(pathFile));
@@ -97,5 +100,18 @@ public class JbseResultParser {
     targetPathList[targetPathList.length - 1] = fileName;
 
     return String.join("/", targetPathList);
+  }
+
+  private void clearPathBlock(String targetPath) {
+    int i = 0;
+    while (true) {
+      File f = new File(changePath(targetPath, String.format("path%d.txt", i)));
+      if (f.exists()) {
+        f.delete();
+        i++;
+      } else {
+        break;
+      }
+    }
   }
 }

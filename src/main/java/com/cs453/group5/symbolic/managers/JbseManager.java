@@ -47,7 +47,11 @@ public class JbseManager {
      * @param jbseResultPath
      * @return
      */
-    public Assumption findPathCond(MethodInfo methodInfo, String jbseResultPath) {
-        return new Assumption(0, pathFinderExecutor.findPathCond(jbseResultPath, methodInfo));
+    public Assumption findPathCond(MethodInfo methodInfo, String jbseResultPath, int mutantId) {
+        return new Assumption(0, pathFinderExecutor.findPathCond(jbseResultPath, methodInfo, mutantId));
+    }
+
+    public void findKillCond(MethodInfo methodInfo, String jbseResultPath, int mutantId) {
+        pathFinderExecutor.findKillCond(jbseResultPath, methodInfo, mutantId);
     }
 }

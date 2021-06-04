@@ -73,7 +73,7 @@ public class Run {
                 classFileManager.applyMutatedClass(mutantNumber);
                 javssManager.insert(methodInfo, falseAssert);
                 jbseManager.runAndExtract(methodInfo, jbsePath, true);
-                Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, methodPath);
+                Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, methodPath, mutantNumber);
 
                 // Finding I condition
                 classFileManager.applyMutatedClass(mutantNumber);
@@ -81,7 +81,7 @@ public class Run {
                 jbseManager.runAndExtract(methodInfo, jbsePath, true);
                 Assumption infectionCond;
                 try {
-                    infectionCond = jbseManager.findPathCond(methodInfo, methodPath);
+                    infectionCond = jbseManager.findPathCond(methodInfo, methodPath, mutantNumber);
                 } catch (IllegalPathFinderOutputException e) {
                     System.out.println("No infection condition. Proceed with reachability condition.");
                     infectionCond = reachabilityCond;
@@ -93,7 +93,7 @@ public class Run {
                 javssManager.insert(methodInfo, infectionCond);
                 jbseManager.runAndExtract(methodInfo, jbsePath, false);
 
-                // TODO: Call kill mutant
+                jbseManager.findKillCond(methodInfo, methodPath, mutantNumber);
             }
         }
 
