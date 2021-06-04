@@ -2,7 +2,7 @@
     {
         "class": "com.cs453.group5.examples.Parenthese",
         "line": 5,
-        "assume": "arr.length <= 2"
+        "assume": "arr.length <= 3"
     },
     {
         "class": "com.cs453.group5.examples.Palindrome",
@@ -12,6 +12,11 @@
     {
         "class": "com.cs453.group5.examples.CharArraySortChecker",
         "line": 5,
-        "assume": "arr.length <= 2"
+        "assume": "arr.length <= 1"
+    },
+    {
+        "class": "com.cs453.group5.examples.TargetNumber",
+        "line": 5,
+        "assume": "arr.length <= 3"
     }
 ]
