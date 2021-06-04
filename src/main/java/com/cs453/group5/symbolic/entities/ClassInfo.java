@@ -9,22 +9,43 @@ import java.util.stream.Collectors;
 
 import org.objectweb.asm.Type;
 
+/**
+ * This class wraps Class class.
+ * 
+ * @see java.lang.Class
+ */
 public class ClassInfo {
     private ClassBinName binaryName;
     private Class classObj;
     private Method[] methods;
 
-    public ClassInfo(ClassBinName classBinName) throws ClassNotFoundException {
-        classObj = Class.forName(classBinName.getDot());
+    public ClassInfo(ClassBinName classBinName) {
+        try {
+            classObj = Class.forName(classBinName.getDot());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Class not found: " + classBinName);
+        }
 
         binaryName = classBinName;
         methods = classObj.getMethods();
     }
 
+    /**
+     * @return Binary name of the class.
+     */
     public ClassBinName getBinaryName() {
         return binaryName;
     }
 
+    /**
+     * Get method information of the class. If the class does not contain the
+     * method, then returns null
+     * 
+     * @param methodName
+     * @return Method info for symbolic execution if there is a method. Otherwise,
+     *         null.
+     */
     public MethodInfo getMethodInfo(String methodName) {
         Function<Parameter, String> paramToDescriptor = (param) -> Type.getDescriptor(param.getType());
         Function<Parameter, String> paramToName = (param) -> param.getName();

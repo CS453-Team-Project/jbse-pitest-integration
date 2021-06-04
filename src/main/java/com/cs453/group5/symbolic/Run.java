@@ -14,11 +14,11 @@ import com.cs453.group5.symbolic.managers.MutantManager;
 import com.cs453.group5.symbolic.managers.PathManager;
 
 public class Run {
-    ClassFileManager classFileManager;
-    PathManager pathManager;
     ClassInfo classInfo;
     ClassBinName classBinName;
 
+    PathManager pathManager;
+    ClassFileManager classFileManager;
     MutantManager mutantManager;
     JbseManager jbseManager;
 
@@ -79,7 +79,7 @@ public class Run {
             try {
                 infectionCond = jbseManager.findPathCond(methodInfo, jbseIPath);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("No infection condition. Proceed with reachability condition.");
                 infectionCond = reachabilityCond;
             }
 

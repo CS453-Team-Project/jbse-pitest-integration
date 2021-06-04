@@ -27,31 +27,44 @@ public class MutationsParser {
         this.pitestBaseDirPath = pitestBaseDirPath;
     }
 
-    public String getRecentPitestReportPath() throws InterruptedException, IOException {
+    private String getRecentPitestReportPath() {
         final String command = String.format("cd %s && ls -d */ | grep 20", pitestBaseDirPath);
         final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command);
 
         String xmlDir = "";
 
-        Process process = processBuilder.start();
-        BufferedReader outReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        try {
+            Process process = processBuilder.start();
+            BufferedReader outReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-        String line;
-        while ((line = outReader.readLine()) != null) {
-            xmlDir = line;
+            String line;
+            while ((line = outReader.readLine()) != null) {
+                xmlDir = line;
+            }
+
+            process.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException("InterruptedException while getting recent piteset report path");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("IOException while getting recent piteset report path");
         }
-
-        process.waitFor();
 
         return String.format("%s/%s/mutations.xml", pitestBaseDirPath, xmlDir);
     }
 
-    private Document getNormalizedDoc(String path) throws SAXException, IOException, ParserConfigurationException {
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = docBuilder.parse(new File(xmlPath));
-        doc.getDocumentElement().normalize();
-
-        return doc;
+    private Document getNormalizedDoc(String path) {
+        Document doc;
+        try {
+            DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            doc = docBuilder.parse(new File(xmlPath));
+            doc.getDocumentElement().normalize();
+            return doc;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Exception while getting normalized pit mutations report.");
+        }
     }
 
     private Boolean isKilledMutant(Element element) {
@@ -76,8 +89,7 @@ public class MutationsParser {
         return new MutantId(mutatedClass, mutatedMethod, methodDescription, mutator, index, block, lineNumber);
     }
 
-    public Set<MutantId> getSurvivedMutantIds()
-            throws SAXException, IOException, ParserConfigurationException, InterruptedException {
+    public Set<MutantId> getSurvivedMutantIds() {
         if (xmlPath == null) {
             xmlPath = getRecentPitestReportPath();
         }

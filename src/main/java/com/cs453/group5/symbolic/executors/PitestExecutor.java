@@ -1,6 +1,5 @@
 package com.cs453.group5.symbolic.executors;
 
-import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,28 +13,30 @@ public class PitestExecutor {
         this.pitReportPath = pitReportPath;
     }
 
-    public int runPitest() {
+    /**
+     * Run putest
+     */
+    public void runPitest() {
         final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command)
                 .redirectError(Redirect.INHERIT);
 
         try {
             System.out.println("Running PIT");
-
-            Process process = processBuilder.start();
-            int exitcode = process.waitFor();
-
+            processBuilder.start().waitFor();
             System.out.println("PIT Complete");
-
-            return exitcode;
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("PIT failed");
         }
-
-        return -1;
     }
 
+    /**
+     * Check whether the exists a pit report. If this returns false, you may want to
+     * run pitest.
+     * 
+     * @see #runPitest()
+     * @return true if the project already has a pit report. Otherwise, false.
+     */
     public Boolean pitReportExists() {
         Path path = Paths.get(pitReportPath);
         return Files.exists(path);

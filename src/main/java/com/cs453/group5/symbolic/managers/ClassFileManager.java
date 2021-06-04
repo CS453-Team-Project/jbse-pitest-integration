@@ -34,8 +34,8 @@ public class ClassFileManager {
             String target = pathManager.getBackupClassPath(classBinName);
             copyFile(source, target);
         } catch (IOException e) {
-            System.err.println(String.format("Original class backup failed: %s.class", classBinName.getDot()));
             e.printStackTrace();
+            throw new RuntimeException(String.format("Original class backup failed: %s.class", classBinName.getDot()));
         }
     }
 
@@ -45,8 +45,9 @@ public class ClassFileManager {
             String target = pathManager.getClassPath(classBinName);
             copyFile(source, target);
         } catch (IOException e) {
-            System.err.println(String.format("Original class restoring failed: %s.class", classBinName.getDot()));
             e.printStackTrace();
+            throw new RuntimeException(
+                    String.format("Original class restoring failed: %s.class", classBinName.getDot()));
         }
     }
 
@@ -56,8 +57,9 @@ public class ClassFileManager {
             String target = pathManager.getClassPath(classBinName);
             copyFile(source, target);
         } catch (IOException e) {
-            System.err.println(String.format("Original class restoring failed: %s.class", classBinName.getDot()));
             e.printStackTrace();
+            throw new RuntimeException(
+                    String.format("Original class restoring failed: %s.class", classBinName.getDot()));
         }
     }
 }

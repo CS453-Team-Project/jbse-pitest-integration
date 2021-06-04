@@ -49,17 +49,11 @@ public class SymMain implements Callable<Integer> {
     }
 
     public Integer call() throws Exception {
-        if (!checkExecutionValidity()) {
-            return 0;
-        }
+        checkExecutionValidity();
 
         if (cleanOpt) {
             CleanBuilder cleanBuilder = new CleanBuilder();
-
-            int exitcode = cleanBuilder.cleanBuild();
-            if (exitcode != 0) {
-                return -1;
-            }
+            cleanBuilder.cleanBuild();
         }
 
         Run run = getRunObj();
@@ -89,12 +83,8 @@ public class SymMain implements Callable<Integer> {
     private Run getRunObj() {
         ClassBinName classBinName = new ClassBinName(classBinaryName);
         ClassInfo classInfo;
-        try {
-            classInfo = new ClassInfo(classBinName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+        classInfo = new ClassInfo(classBinName);
 
         MutationsParser mutParser = new MutationsParser(pathManager.getPitestBaseDirPath());
         MutantDetailsParser detailsParser = new MutantDetailsParser(pathManager.getMutantsDirPath(classBinName));
@@ -112,13 +102,10 @@ public class SymMain implements Callable<Integer> {
         return new Run(pathManager, classFileManager, mutantManager, jbseManager, classInfo);
     }
 
-    private Boolean checkExecutionValidity() {
+    private void checkExecutionValidity() {
         if (!pathManager.isProjectHome()) {
-            System.out
-                    .println("The program must be executed in the project root directory. Checkout CS453_PROJECT_HOME");
-            return false;
+            throw new IllegalStateException(
+                    "The program must be executed in the project root directory. Checkout CS453_PROJECT_HOME");
         }
-
-        return true;
     }
 }

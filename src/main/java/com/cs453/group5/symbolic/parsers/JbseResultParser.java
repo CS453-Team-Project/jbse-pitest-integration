@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JbseResultParser {
-  public static Boolean isStartingPoint(String st) {
+  private static Boolean isStartingPoint(String st) {
     if (st.isEmpty()) {
       return false;
     }
     return st.toCharArray()[0] == '.';
   }
 
-  public static Boolean isViolated(String st, boolean violation) {
+  private static Boolean isViolated(String st, boolean violation) {
     if (violation) {
       return st.contains("path violates an assertion.");
     } else {
@@ -26,6 +26,13 @@ public class JbseResultParser {
     }
   }
 
+  /**
+   * Modify the jbse result. If violation is true, then only viloated paths will
+   * remain after the extraction. Otherwise, only safe paths will remain.
+   * 
+   * @param targetPath
+   * @param violation
+   */
   public void extract(String targetPath, boolean violation) {
     try {
       File file = new File(targetPath);
@@ -72,8 +79,10 @@ public class JbseResultParser {
       bufferedReader.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
+      throw new RuntimeException("Jbse result not found: " + targetPath);
     } catch (IOException e) {
       e.printStackTrace();
+      throw new RuntimeException("IOException");
     }
   }
 }

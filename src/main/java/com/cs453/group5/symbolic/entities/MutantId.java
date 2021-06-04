@@ -2,6 +2,11 @@ package com.cs453.group5.symbolic.entities;
 
 import java.util.Objects;
 
+/**
+ * This class contains the identifying information about mutations. We can
+ * compare two mutants with this class.
+ */
+
 public class MutantId {
     private String mutatedClass;
     private String mutatedMethod;

@@ -23,45 +23,65 @@ public class MutantTransformer {
   }
 
   public void insertBytecode(int lineno, String command) {
+    String userCommand = "true";
+
+    // Get target class file
+    ClassPool pool = ClassPool.getDefault();
+    pool.importPackage("jbse.meta.Analysis.ass3rt");
+
+    CtClass cc;
+    CtMethod m;
     try {
-      // Get target class file
-      ClassPool pool = ClassPool.getDefault();
-      pool.importPackage("jbse.meta.Analysis.ass3rt");
-      CtClass cc = pool.get(targetClass);
+      cc = pool.get(targetClass);
+      m = cc.getDeclaredMethod(targetMethod);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+      throw new RuntimeException("NotfoundException (javassist): " + targetClass);
+    }
 
-      CtMethod m = cc.getDeclaredMethod(targetMethod);
-
-      // Insert Byte code, ass3rt(false) in target file
+    // Insert Byte code, ass3rt(false) in target file
+    try {
       m.insertAt(lineno, true, command);
       // Insert user custom assume option
       if (userAssume.getLine() != -1) {
-        String userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
+        userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
         m.insertBefore(userCommand);
       }
 
       // Write class file
       cc.writeFile(this.saveDirPath);
       cc.detach();
-
-      System.out.println("Success");
-    } catch (NotFoundException e) {
-      e.printStackTrace();
     } catch (CannotCompileException e) {
       e.printStackTrace();
+      System.err.println(String.format("comamnd: %s\nusercommand: %s", command, userCommand));
+      throw new RuntimeException("Cannot insert: " + command + " in line number: " + Integer.toString(lineno));
     } catch (IOException e) {
       e.printStackTrace();
+      throw new RuntimeException("IO Exception (javassist)");
     }
+
+    System.out.println("Success");
   }
 
   public void insertBoth(int lineno, String condition, String command) {
-    try {
-      // Get target class file
-      ClassPool pool = ClassPool.getDefault();
-      pool.importPackage("jbse.meta.Analysis.ass3rt");
-      pool.importPackage("jbse.meta.Analysis.assume");
-      CtClass cc = pool.get(targetClass);
+    String userCommand = "true";
 
-      CtMethod m = cc.getDeclaredMethod(targetMethod);
+    // Get target class file
+    ClassPool pool = ClassPool.getDefault();
+    pool.importPackage("jbse.meta.Analysis.ass3rt");
+    pool.importPackage("jbse.meta.Analysis.assume");
+
+    CtClass cc;
+    CtMethod m;
+    try {
+      cc = pool.get(targetClass);
+      m = cc.getDeclaredMethod(targetMethod);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+      throw new RuntimeException("NotfoundException (javassist): " + targetClass);
+    }
+
+    try {
       // Insert Byte code, ass3rt(false) in target file
       m.insertBefore(String.format("jbse.meta.Analysis.assume(%s);", condition));
       if (!command.equals("")) {
@@ -69,7 +89,7 @@ public class MutantTransformer {
       }
       // Insert user custom assume option
       if (userAssume.getLine() != -1) {
-        String userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
+        userCommand = String.format("jbse.meta.Analysis.assume(%s);", userAssume.getCommand());
         System.out.println(userCommand);
         m.insertBefore(userCommand);
       }
@@ -77,14 +97,15 @@ public class MutantTransformer {
       // Write class file
       cc.writeFile(this.saveDirPath);
       cc.detach();
-
-      System.out.println("Success");
-    } catch (NotFoundException e) {
-      e.printStackTrace();
     } catch (CannotCompileException e) {
       e.printStackTrace();
+      System.err.println(String.format("comamnd: %s\nusercommand: %s", command, userCommand));
+      throw new RuntimeException("Cannot insert: " + command + " in line number: " + Integer.toString(lineno));
     } catch (IOException e) {
       e.printStackTrace();
+      throw new RuntimeException("IO Exception (javassist)");
     }
+
+    System.out.println("Success");
   }
 }

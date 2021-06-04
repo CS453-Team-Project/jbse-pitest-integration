@@ -1,5 +1,10 @@
 package com.cs453.group5.symbolic.entities;
 
+/**
+ * This class contains information about the method.
+ * 
+ * @see ClassInfo
+ */
 public class MethodInfo {
     private ClassBinName classBinName;
     private String methodName;
@@ -13,18 +18,32 @@ public class MethodInfo {
         this.paramNames = paramNames;
     }
 
+    /**
+     * @return Binary name of the class that contains this method.
+     */
     public ClassBinName getClassBinName() {
         return classBinName;
     }
 
+    /**
+     * @return method name
+     */
     public String getName() {
         return methodName;
     }
 
+    /**
+     * 
+     * @return descriptor of the method
+     */
     public String getDescriptor() {
         return descriptor;
     }
 
+    /**
+     * 
+     * @return An array of parameter names
+     */
     public String[] getParamNames() {
         return paramNames;
     }

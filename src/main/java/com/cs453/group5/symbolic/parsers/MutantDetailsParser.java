@@ -14,6 +14,13 @@ public class MutantDetailsParser {
         this.mutantsDirPath = mutantsDirPath;
     }
 
+    /**
+     * Parse the details.txt which is in MutantsDirPath/{mutantIndex} and return
+     * MutantId.
+     * 
+     * @param mutantIndex
+     * @return MutantId
+     */
     public MutantId getMutantDetails(int mutantIndex) {
         final String detailsPath = String.format("%s/%d/details.txt", mutantsDirPath, mutantIndex);
         String details = "";

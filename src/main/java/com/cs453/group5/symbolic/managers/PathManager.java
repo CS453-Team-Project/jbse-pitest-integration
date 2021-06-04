@@ -8,10 +8,10 @@ import com.cs453.group5.symbolic.entities.ClassBinName;
 /**
  * Class that manages absolute path of a file or a directory.
  * 
- * 1. Naming convention
+ * Member name terminate with DirPath means a path of a directory. Path means a
+ * path of a file.
  * 
- * @DirPath - Path of a directory
- * @Path - Path of a file
+ * @author Yeongil Yoon
  */
 public class PathManager {
     private static final String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
