@@ -8,7 +8,7 @@ public class TestTargetNumber {
     @Test
     public void test1() {
         TargetNumber obj = new TargetNumber();
-        int[] arr = { 1, 1, 1, 1, 1 };
-        assertEquals(5, obj.solution(arr, 3));
+        int[] arr = { 1, 1, 1, 1, 2 };
+        assertEquals(4, obj.solution(arr, 4));
     }
 }
