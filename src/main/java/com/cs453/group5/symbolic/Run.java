@@ -45,6 +45,9 @@ public class Run {
         classFileManager.backupOriginalClass();
         jbseManager.clearKillReport();
 
+        int total = 0;
+        int killed = 0;
+
         // Get alived Mutants
         Map<String, List<Pair<Integer, MutantId>>> aliveMutantIds = mutantManager.getAliveMutants();
         Set<String> methods = aliveMutantIds.keySet().stream()
@@ -57,6 +60,8 @@ public class Run {
 
             List<Pair<Integer, MutantId>> pairs = aliveMutantIds.get(method);
             for (Pair<Integer, MutantId> pair : pairs) {
+                total++;
+
                 int mutantNumber = pair.getFirst();
                 MutantId mutId = pair.getSecond();
 
@@ -100,6 +105,7 @@ public class Run {
                     jbseManager.runAndExtract(methodInfo, jbsePath, false);
 
                     jbseManager.findKillCond(methodInfo, methodPath, mutantNumber);
+                    killed++;
                 } catch (Exception e) {
                     System.out.println("failed to kill: \n" + mutId.toString());
                 }
@@ -107,6 +113,10 @@ public class Run {
         }
 
         classFileManager.restoreOriginalClass();
+
+        System.out.println("=========== Finished successfully! ===========");
+        System.out.println(String.format("Total %d survived mutants. Killed %d mutants.", total, killed));
+        System.out.println("==============================================");
     }
 
     public void runOriginal(List<String> methodNames) {
@@ -124,6 +134,7 @@ public class Run {
         final String jbseResultPath = pathManager.getJbseResultPath(classBinName, relativePath, 0);
         final MethodInfo methodInfo = classInfo.getMethodInfo(method);
 
+        javssManager.insert(methodInfo);
         jbseManager.runAndExtract(methodInfo, jbseResultPath, violation);
     }
 

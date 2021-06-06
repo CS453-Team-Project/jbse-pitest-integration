@@ -49,7 +49,7 @@ public class MutantTransformer {
         if (line == 0) {
           m.insertBefore(assertStr);
         } else {
-          m.insertAt(line, assertStr);
+          m.insertAt(line, true, assertStr);
         }
       }
 
@@ -57,13 +57,16 @@ public class MutantTransformer {
         int line = assumption.getLine();
         String assumeStr = assumption.getAssumption();
 
+        System.out.println(line);
+        System.out.println(assumeStr);
+
         debugInt = line;
         debugStr = assumeStr;
 
         if (line == 0) {
           m.insertBefore(assumeStr);
         } else {
-          m.insertAt(line, assumeStr);
+          m.insertAt(line, true, assumeStr);
         }
       }
 

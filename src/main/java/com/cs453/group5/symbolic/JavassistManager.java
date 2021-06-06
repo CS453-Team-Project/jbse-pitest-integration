@@ -34,6 +34,10 @@ public class JavassistManager {
         mutTransformer.insert(methodInfo, assertList, assumeList);
     }
 
+    public void insert(MethodInfo methodInfo) {
+        this.insert(methodInfo, new ArrayList<Assertion>(), new ArrayList<Assumption>());
+    }
+
     public void insert(MethodInfo methodInfo, Assertion assertion) {
         this.insert(methodInfo, Arrays.asList(assertion), new ArrayList<Assumption>());
     }
