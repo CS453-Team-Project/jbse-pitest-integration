@@ -77,8 +77,6 @@ public class MutantDetailsParser {
             result.add(new Pair<Integer, MutantId>(i - 1, mutId));
         }
 
-        assert (false);
-
         return result;
     }
 }

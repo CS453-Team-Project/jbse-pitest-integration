@@ -16,7 +16,8 @@ import com.cs453.group5.symbolic.entities.ClassBinName;
 public class PathManager {
     private static final String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 
-    private final String projectHome = System.getenv("CS453_PROJECT_HOME");
+    private final String toolHome = System.getenv("CS453_PROJECT_HOME");
+    private final String projectHome = System.getProperty("user.dir");
 
     private final String classDirPath = String.format("%s/target/classes", projectHome);
     private final String backupClassDirPath = String.format("%s/target/backup-classes", projectHome);
@@ -24,7 +25,9 @@ public class PathManager {
     private final String pitestBaseDirPath = String.format("%s/target/pit-reports", projectHome);
 
     private final String jbseResultsDirPath = String.format("%s/target/jbse-results/%s", projectHome, timestamp);
-    private final String jbseLibPath = String.format("%s/res/jbse-0.10.0-SNAPSHOT-shaded.jar", projectHome);
+    private final String jbseLibPath = String.format("%s/res/jbse-0.10.0-SNAPSHOT-shaded.jar", toolHome);
+
+    private final String killReportPath = String.format("%s/kill_cond.txt", projectHome);
 
     private final String userAssumePath = String.format("%s/assume/my_tool_assume.json", projectHome);
 
@@ -66,12 +69,16 @@ public class PathManager {
                 mutantNumber);
     }
 
-    public String getJbseMethodPath(ClassBinName classBinName, String subdir) {
+    public String getJbseMethodDirPath(ClassBinName classBinName, String subdir) {
         return String.format("%s/%s/%s", jbseResultsDirPath, classBinName.getSlash(), subdir);
     }
 
     public String getJbseLibPath() {
         return jbseLibPath;
+    }
+
+    public String getKillReportPath() {
+        return killReportPath;
     }
 
     public String getUserAssumePath() {

@@ -54,4 +54,8 @@ public class JbseManager {
     public void findKillCond(MethodInfo methodInfo, String jbseResultPath, int mutantId) {
         pathFinderExecutor.findKillCond(jbseResultPath, methodInfo, mutantId);
     }
+
+    public void clearKillReport() {
+        pathFinderExecutor.clearKillReport();
+    }
 }

@@ -94,7 +94,7 @@ public class SymMain implements Callable<Integer> {
 
         JbseExecutor jbseExecutor = new JbseExecutor(pathManager.getClassDirPath(), pathManager.getJbseLibPath());
         JbseResultParser jbseResultParser = new JbseResultParser();
-        PathFinderExecutor pathFinderExecutor = new PathFinderExecutor();
+        PathFinderExecutor pathFinderExecutor = new PathFinderExecutor(pathManager.getKillReportPath());
 
         UserAssumeParser assumeParser = new UserAssumeParser(pathManager.getUserAssumePath(), classBinName);
         MutantTransformer mutTransformer = new MutantTransformer(pathManager.getClassDirPath());

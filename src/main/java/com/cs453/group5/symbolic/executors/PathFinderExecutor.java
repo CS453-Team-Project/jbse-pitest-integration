@@ -8,11 +8,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.cs453.group5.symbolic.entities.MethodInfo;
 import com.cs453.group5.symbolic.exceptions.IllegalPathFinderOutputException;
 
 public class PathFinderExecutor {
+    private String killReportPath;
+
+    public PathFinderExecutor(String killReportPath) {
+        this.killReportPath = killReportPath;
+    }
+
     /**
      * Find path condition of a method. A jbse report path and a method ibfo should
      * be provided.
@@ -23,25 +31,18 @@ public class PathFinderExecutor {
      */
     public String findPathCond(String jbseMethodPath, MethodInfo methodInfo, int mutantId) {
         makeMethodsTxt(methodInfo, jbseMethodPath);
+
         File dir = new File(jbseMethodPath + "/mutants/" + mutantId);
         File[] pathList = dir.listFiles();
-        ArrayList<String> condition = new ArrayList<String>();
-
         if (pathList.length == 0) {
             throw new IllegalPathFinderOutputException();
         }
 
-        for (int i = 0; i < pathList.length; i++) {
-            final String command = String.format(
-                    "python3 parse-jbse-output/src/main.py -a parse -p %s -m %d -f \"path%d.txt\"", jbseMethodPath,
-                    mutantId, i);
-            System.out.println(command);
-            String[] output = runPathFinder(command);
-            String result = parsePathCondDeprecated1(output);
+        final String command = String.format("python3 parse-jbse-output/src/main.py -a parse -p %s -m %d",
+                jbseMethodPath, mutantId);
+        String[] output = runPathFinder(command);
+        String result = parsePathCondDeprecated1(output);
 
-            condition.add(result);
-        }
-        String result = String.join(" || ", condition);
         System.out.println(result);
         return result;
     }
@@ -55,41 +56,45 @@ public class PathFinderExecutor {
             throw new IllegalPathFinderOutputException();
         }
 
-        for (int i = 0; i < pathList.length; i++) {
-            final String command = String.format(
-                    "python3 parse-jbse-output/src/main.py -a kill -p %s -m %d -f \"path%d.txt\"", jbseMethodPath,
-                    mutantId, i);
-            System.out.println(command);
-            String[] output = runPathFinder(command);
-            System.out.println(String.join("\n", output));
+        final String command = String.format("python3 parse-jbse-output/src/main.py -a kill -p %s -m %d",
+                jbseMethodPath, mutantId);
+        String[] output = runPathFinder(command);
+        String outputStr = String.join("\n", output);
 
-            try {
-                BufferedWriter pathWriter = new BufferedWriter(
-                        new FileWriter("/root/jbse-pitest-integration/kill_cond.txt", true));
+        System.out.println(outputStr);
+        try {
+            BufferedWriter pathWriter = new BufferedWriter(new FileWriter(killReportPath, true));
 
-                pathWriter.write(String.join("\n", output) + "\n\n");
-                pathWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            pathWriter.write(methodInfo.dumpString() + "\n" + outputStr + "\n\n");
+            pathWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("IOException");
         }
     }
 
-    // TODO: new method: Kill Mutant
+    public void clearKillReport() {
+        try {
+            BufferedWriter clear = new BufferedWriter(new FileWriter(killReportPath));
+            clear.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("IOException");
+        }
+    }
 
     private String parsePathCondDeprecated1(String[] output) {
         String result = null;
 
-        if (output.length > 0) {
-            result = output[0];
+        if (output.length > 1) {
+            List<String> conditions = IntStream.range(0, output.length).filter((i) -> i % 2 == 1)
+                    .mapToObj((i) -> output[i]).map((str) -> str.equals("") || str.equals("True") ? "true" : str)
+                    .map((str) -> "(" + str + ")").collect(Collectors.toList());
+            result = String.join("||", conditions);
         }
 
-        if (result == null || result.isEmpty()) {
+        if (result == null) {
             throw new IllegalPathFinderOutputException();
-        }
-
-        if (result.equals("True")) {
-            return "true";
         }
 
         return String.format("(%s)", result);
