@@ -47,3 +47,6 @@ RUN wget -O z3.zip https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3
 # ENV
 ENV JAVA_HOME /usr/lib/java
 ENV PATH /opt/apache-maven-3.8.1/bin:$JAVA_HOME/bin:$PATH
+ENV CS453_PROJECT_HOME /root/jbse-pitest-integration
+
+RUN echo 'alias mytool="java -cp target/classes:$CS453_PROJECT_HOME/target/classes:$CS453_PROJECT_HOME/res/javassist.jar:$CS453_PROJECT_HOME/res/jbse-0.10.0-SNAPSHOT-shaded.jar:$CS453_PROJECT_HOME/res/picocli-4.6.1.jar:$CS453_PROJECT_HOME/res/asm-all-3.3.1.jar:$CS453_PROJECT_HOME/res/json-20210307.jar com.cs453.group5.symbolic.SymMain"' >> .bashrc
