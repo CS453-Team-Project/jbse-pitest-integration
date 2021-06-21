@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class PathFinderExecutor {
 
         final String command = String.format("python3 parse-jbse-output/src/main.py -a parse -p %s -m %d",
                 jbseMethodPath, mutantId);
+        System.out.println(command);
         String[] output = runPathFinder(command);
         String result = parsePathCondDeprecated1(output);
 
@@ -58,6 +60,7 @@ public class PathFinderExecutor {
 
         final String command = String.format("python3 parse-jbse-output/src/main.py -a kill -p %s -m %d",
                 jbseMethodPath, mutantId);
+        System.out.println(command);
         String[] output = runPathFinder(command);
         String outputStr = String.join("\n", output);
 
@@ -65,7 +68,8 @@ public class PathFinderExecutor {
         try {
             BufferedWriter pathWriter = new BufferedWriter(new FileWriter(killReportPath, true));
 
-            pathWriter.write("// " + methodInfo.dumpString() + "\n" + outputStr + "\n\n");
+            pathWriter
+                    .write("// " + methodInfo.dumpString() + "\n// mutantId: " + mutantId + "\n" + outputStr + "\n\n");
             pathWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,7 +107,8 @@ public class PathFinderExecutor {
     private String[] runPathFinder(String command) {
         List<String> result = new ArrayList<>();
 
-        final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command);
+        final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command)
+                .redirectError(Redirect.INHERIT);
 
         try {
             Process process = processBuilder.start();
