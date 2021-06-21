@@ -80,12 +80,14 @@ public class Run {
                     final String jbsePath = pathManager.getJbseResultPath(classBinName, relativePath, mutantNumber);
 
                     // Finding R condition
+                    System.out.println("---------------------------------------R");
                     classFileManager.applyMutatedClass(mutantNumber);
                     javssManager.insert(methodInfo, falseAssert);
                     jbseManager.runAndExtract(methodInfo, jbsePath, true);
                     Assumption reachabilityCond = jbseManager.findPathCond(methodInfo, methodPath, mutantNumber);
 
                     // Finding I condition
+                    System.out.println("---------------------------------------I");
                     classFileManager.applyMutatedClass(mutantNumber);
                     javssManager.insert(methodInfo, falseAssertAfter, reachabilityCond);
                     jbseManager.runAndExtract(methodInfo, jbsePath, true);
@@ -100,12 +102,14 @@ public class Run {
 
                     // Comparing mutant and origin
                     // mutant
+                    System.out.println("---------------------------------------P");
                     classFileManager.applyMutatedClass(mutantNumber);
                     javssManager.insert(methodInfo, infectionCond);
                     jbseManager.runAndExtract(methodInfo, jbsePath, false);
 
                     jbseManager.findKillCond(methodInfo, methodPath, mutantNumber);
                     killed++;
+                    System.out.println("Kill success: \n" + mutId.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.out.println("failed to kill: \n" + mutId.toString());
