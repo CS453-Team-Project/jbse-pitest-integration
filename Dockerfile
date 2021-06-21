@@ -29,6 +29,7 @@ RUN wget -O python3.9.tar.gz https://www.python.org/ftp/python/3.9.4/Python-3.9.
 
 # Source code
 RUN git clone https://github.com/CS453-Team-Project/jbse-pitest-integration
+RUN cd jbse-pitest-integration && git clone https://github.com/CS453-Team-Project/parse-jbse-output.git
 
 # MAVEN
 RUN wget -O maven.tar.gz https://mirror.navercorp.com/apache/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz && \
@@ -46,9 +47,3 @@ RUN wget -O z3.zip https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3
 # ENV
 ENV JAVA_HOME /usr/lib/java
 ENV PATH /opt/apache-maven-3.8.1/bin:$JAVA_HOME/bin:$PATH
-
-# JBSE
-RUN git clone https://github.com/pietrobraione/jbse.git ~/jbse && \
-    cd jbse && \
-    ./gradlew build && \
-    cp ./build/libs/jbse-0.10.0-SNAPSHOT-shaded.jar ~/jbse-pitest-integration//src/main/java/com/cs453/group5/examples
