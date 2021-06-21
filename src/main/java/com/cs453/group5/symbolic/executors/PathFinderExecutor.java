@@ -90,7 +90,7 @@ public class PathFinderExecutor {
             List<String> conditions = IntStream.range(0, output.length).filter((i) -> i % 2 == 1)
                     .mapToObj((i) -> output[i]).map((str) -> str.equals("") || str.equals("True") ? "true" : str)
                     .map((str) -> "(" + str + ")").collect(Collectors.toList());
-            result = String.join("||", conditions);
+            result = String.join("||", conditions).replace(".value.length", ".length()");
         }
 
         if (result == null) {

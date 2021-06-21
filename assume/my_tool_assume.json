@@ -31,7 +31,7 @@
         "assumes": [
             {
                 "line": 5,
-                "assume": "arr.length <= 3"
+                "assume": "numbers.length <= 3"
             }
         ]
     },
