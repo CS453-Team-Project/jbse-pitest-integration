@@ -107,6 +107,7 @@ public class Run {
                     jbseManager.findKillCond(methodInfo, methodPath, mutantNumber);
                     killed++;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     System.out.println("failed to kill: \n" + mutId.toString());
                 }
             }

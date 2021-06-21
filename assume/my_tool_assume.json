@@ -13,7 +13,7 @@
         "assumes": [
             {
                 "line": 5,
-                "assume": "string.length() <= 1"
+                "assume": "string.length() <= 10"
             }
         ]
     },
