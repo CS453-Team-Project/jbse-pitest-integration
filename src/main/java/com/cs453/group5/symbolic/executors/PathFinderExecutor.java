@@ -65,7 +65,7 @@ public class PathFinderExecutor {
         try {
             BufferedWriter pathWriter = new BufferedWriter(new FileWriter(killReportPath, true));
 
-            pathWriter.write(methodInfo.dumpString() + "\n" + outputStr + "\n\n");
+            pathWriter.write("// " + methodInfo.dumpString() + "\n" + outputStr + "\n\n");
             pathWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
