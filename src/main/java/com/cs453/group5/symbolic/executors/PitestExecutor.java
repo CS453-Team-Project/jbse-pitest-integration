@@ -18,7 +18,8 @@ public class PitestExecutor {
      */
     public void runPitest() {
         final ProcessBuilder processBuilder = new ProcessBuilder("/bin/bash", "-c", command)
-                .redirectError(Redirect.INHERIT);
+                .redirectError(Redirect.INHERIT)
+                .redirectOutput(Redirect.INHERIT);
 
         try {
             System.out.println("Running PIT");
