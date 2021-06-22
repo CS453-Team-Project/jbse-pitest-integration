@@ -2,6 +2,9 @@
 
 [See final team report](https://github.com/CS453-Team-Project/report/blob/main/main.pdf)
 
+## Python Path Condition Solver
+
+[See Path Condition Solver project](https://github.com/CS453-Team-Project/parse-jbse-output)
 
 ## Docker build
 
