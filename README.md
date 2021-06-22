@@ -44,21 +44,21 @@ Usage: <main class> [-co] [-m=<mutantNumbers>[,<mutantNumbers>...]...]...
                             The program will not modify the byte code and
                             return pure jbse report.
 
-# Examples
-# 1. Run pitest if needed. Find survived mutants. Insert jbse ass3rt. run jbse.
+# Run Examples
+# 1. Run pitest if needed. Find test cases for survived mutants.
 $ mytool com.cs453.group5.examples.Parenthese
 
-# 2. Run pitest if needed. Find mutant 1, 2, 3, 4. Run jbse.
-$ mytool com.cs453.group5.examples.Parenthese -m 1,2,3,4
+# 2. Run pitest if needed. Run symbolic execution for mutant 1 and 3. You need to specify method names.
+$ mytool com.cs453.group5.examples.Parenthese -m 1,3 check
 
-# 3. Run pitest if needed. Find original class file. Run jbse.
-$ mytool com.cs453.group5.examples.Parenthese -o
+# 3. Run pitest if needed. Run symbolic execution for the original binary file. You need to specify method names.
+$ mytool com.cs453.group5.examples.Parenthese -o check
 
-# 4. Clean build and run pitest. Same with ex 1.
+# 4. Clean build and run pitest if needed. Same with example 1.
 $ mytool com.cs453.group5.examples.Parenthese -c
 
-# 5. Run pitest if needed. Find survived mutants that has mutated method check1 or check2. Insert jbse ass3rt. run jbse.
-$ mytool com.cs453.group5.examples.Parenthes check1 check2
+# 5. Run pitest if needed. Find test cases for survived mutants that has mutated method "check".
+$ mytool com.cs453.group5.examples.Parenthes check
 ```
 
 # Legacy
