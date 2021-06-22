@@ -22,7 +22,7 @@ docker build -t <image name> .
 
 ### MutRe 실행 방법
 ```sh
-# Append following lines to ~/.bashrc
+# Append following lines to ~/.bashrc (you don't have to add following on a docker container)
 export CS453_PROJECT_HOME="/root/jbse-pitest-integration"
 alias mytool="java -cp target/classes:$CS453_PROJECT_HOME/target/classes:$CS453_PROJECT_HOME/res/javassist.jar:$CS453_PROJECT_HOME/res/jbse-0.10.0-SNAPSHOT-shaded.jar:$CS453_PROJECT_HOME/res/picocli-4.6.1.jar:$CS453_PROJECT_HOME/res/asm-all-3.3.1.jar:$CS453_PROJECT_HOME/res/json-20210307.jar com.cs453.group5.symbolic.SymMain"
 
